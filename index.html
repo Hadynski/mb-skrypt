@@ -1,0 +1,2095 @@
+<meta charset="utf-8">
+<title>M&B — Skrypt sprzedażowy</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{
+  --bg:#f5f5f7; --card:#ffffff; --card2:#fbfbfd;
+  --text:#1d1d1f; --text2:#6e6e73; --text3:#aeaeb2;
+  --accent:#0071e3; --accent-soft:rgba(0,113,227,.10);
+  --green:#34c759; --green-soft:rgba(52,199,89,.12);
+  --red:#ff3b30; --red-soft:rgba(255,59,48,.10);
+  --amber:#b25000; --amber-soft:#fff8f0; --amber-line:#f2d8b8;
+  --line:rgba(0,0,0,.08); --line2:rgba(0,0,0,.05);
+  --shadow:0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06);
+  --radius:18px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#000000; --card:#1c1c1e; --card2:#161618;
+    --text:#f5f5f7; --text2:#98989d; --text3:#636366;
+    --accent:#0a84ff; --accent-soft:rgba(10,132,255,.16);
+    --green:#30d158; --green-soft:rgba(48,209,88,.16);
+    --red:#ff453a; --red-soft:rgba(255,69,58,.16);
+    --amber:#ffb066; --amber-soft:#221a10; --amber-line:#3d2f1c;
+    --line:rgba(255,255,255,.12); --line2:rgba(255,255,255,.07);
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="light"]{
+  --bg:#f5f5f7; --card:#ffffff; --card2:#fbfbfd;
+  --text:#1d1d1f; --text2:#6e6e73; --text3:#aeaeb2;
+  --accent:#0071e3; --accent-soft:rgba(0,113,227,.10);
+  --green:#34c759; --green-soft:rgba(52,199,89,.12);
+  --red:#ff3b30; --red-soft:rgba(255,59,48,.10);
+  --amber:#b25000; --amber-soft:#fff8f0; --amber-line:#f2d8b8;
+  --line:rgba(0,0,0,.08); --line2:rgba(0,0,0,.05);
+  --shadow:0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06);
+}
+:root[data-theme="dark"]{
+  --bg:#000000; --card:#1c1c1e; --card2:#161618;
+  --text:#f5f5f7; --text2:#98989d; --text3:#636366;
+  --accent:#0a84ff; --accent-soft:rgba(10,132,255,.16);
+  --green:#30d158; --green-soft:rgba(48,209,88,.16);
+  --red:#ff453a; --red-soft:rgba(255,69,58,.16);
+  --amber:#ffb066; --amber-soft:#221a10; --amber-line:#3d2f1c;
+  --line:rgba(255,255,255,.12); --line2:rgba(255,255,255,.07);
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased; font-size:16px; line-height:1.5;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px 96px}
+header.app{
+  position:sticky;top:0;z-index:30;
+  background:color-mix(in srgb, var(--bg) 82%, transparent);
+  -webkit-backdrop-filter:saturate(180%) blur(20px); backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:1px solid var(--line2);
+}
+.hbar{max-width:1180px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:16px}
+.brand{font-weight:700;font-size:17px;letter-spacing:-.02em;white-space:nowrap}
+.brand small{display:block;font-weight:500;font-size:12px;color:var(--text2);letter-spacing:0}
+.phases{display:flex;gap:4px;flex:1;justify-content:center;flex-wrap:wrap}
+.phase{
+  font-size:12px;font-weight:600;color:var(--text3);
+  padding:5px 11px;border-radius:999px;white-space:nowrap;
+  transition:all .25s ease;
+}
+.phase.done{color:var(--green)}
+.phase.active{background:var(--accent-soft);color:var(--accent)}
+.hbtn{
+  border:none;background:none;color:var(--accent);font:inherit;font-size:14px;font-weight:600;
+  cursor:pointer;padding:6px 12px;border-radius:999px;white-space:nowrap;
+}
+.hbtn:hover{background:var(--accent-soft)}
+@media (max-width:900px){
+  .hbar{flex-wrap:wrap;gap:8px;padding:12px 16px}
+  .brand{flex:1}
+  .phases{order:3;width:100%;justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .phases::-webkit-scrollbar{display:none}
+}
+main{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:24px;margin-top:28px;align-items:start}
+main.no-notes{grid-template-columns:1fr}
+@media (max-width:900px){
+  main{grid-template-columns:1fr}
+  .notes-col{display:none}
+}
+/* ---------- STAGE ---------- */
+.stage{min-width:0}
+.card{
+  background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:32px 34px;animation:rise .35s cubic-bezier(.2,.7,.3,1);
+}
+@media (max-width:600px){.card{padding:24px 20px}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.card{animation:none}.phase{transition:none}}
+.tag{
+  display:inline-block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--accent);background:var(--accent-soft);padding:4px 10px;border-radius:999px;margin-bottom:14px;
+}
+.step-title{font-size:22px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px;text-wrap:balance}
+.speech{
+  font-size:19px;line-height:1.62;letter-spacing:-.01em;margin:18px 0 6px;
+  padding-left:18px;border-left:3px solid var(--accent);max-width:62ch;white-space:pre-wrap;
+}
+.speech + .speech{margin-top:14px}
+.speech .ph{color:var(--accent);font-weight:600}
+.hint{
+  margin:18px 0 0;padding:12px 16px;border-radius:12px;
+  background:var(--amber-soft);border:1px solid var(--amber-line);
+  color:var(--amber);font-size:14px;line-height:1.5;max-width:62ch;
+}
+.hint b{font-weight:700}
+.fields{margin-top:22px;display:flex;flex-direction:column;gap:14px;max-width:520px}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px}
+input[type=text],input[type=datetime-local],textarea{
+  width:100%;font:inherit;font-size:16px;color:var(--text);
+  background:var(--card2);border:1px solid var(--line);border-radius:12px;
+  padding:11px 14px;outline:none;transition:border-color .15s, box-shadow .15s;
+}
+input[type=datetime-local]{max-width:320px;-webkit-appearance:none;appearance:none}
+input[type=datetime-local]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.6}
+textarea{resize:vertical;min-height:72px}
+input[type=text]:focus,input[type=datetime-local]:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.dt-preview{font-size:13px;color:var(--accent);font-weight:600;margin-top:6px;min-height:16px}
+.woj-select{
+  width:100%;max-width:320px;font:inherit;font-size:16px;color:var(--text);
+  background:var(--card2);border:1px solid var(--line);border-radius:12px;
+  padding:11px 14px;outline:none;-webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236e6e73' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;
+  transition:border-color .15s, box-shadow .15s;
+}
+.woj-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.seg{display:inline-flex;background:var(--card2);border:1px solid var(--line);border-radius:11px;padding:3px;gap:2px}
+.seg button{
+  border:none;background:none;font:inherit;font-size:14px;font-weight:600;color:var(--text2);
+  padding:7px 16px;border-radius:8px;cursor:pointer;transition:all .15s;
+}
+.seg button.on{background:var(--accent);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.gpreview{font-size:13px;color:var(--text2);margin-top:7px}
+.field label #gAuto{font-weight:500;color:var(--text3)}
+.hbtn.armed,.btn.armed{color:var(--red)}
+.icobtn.armed{background:var(--red-soft);color:var(--red)}
+.choices{display:flex;flex-direction:column;gap:10px;margin-top:24px;max-width:520px}
+.choice{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  text-align:left;font:inherit;font-size:16px;font-weight:600;color:var(--text);
+  background:var(--card2);border:1px solid var(--line);border-radius:14px;
+  padding:15px 18px;cursor:pointer;transition:border-color .15s, background .15s, transform .1s;
+}
+.choice:hover{border-color:var(--accent);background:var(--accent-soft)}
+.choice:active{transform:scale(.99)}
+.choice .arr{color:var(--text3);font-weight:400}
+.choice small{display:block;font-weight:500;font-size:13px;color:var(--text2);margin-top:2px}
+.navrow{display:flex;gap:12px;margin-top:30px;align-items:center;flex-wrap:wrap}
+.btn{
+  font:inherit;font-size:16px;font-weight:600;border:none;cursor:pointer;
+  border-radius:999px;padding:12px 26px;transition:transform .1s, opacity .15s, background .15s;
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{opacity:.9}
+.btn-ghost{background:none;color:var(--accent)}
+.btn-ghost:hover{background:var(--accent-soft)}
+.btn-danger{background:none;color:var(--red)}
+.btn-danger:hover{background:var(--red-soft)}
+.btn:focus-visible,.choice:focus-visible,.seg button:focus-visible,.hbtn:focus-visible,.icobtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* checklist */
+.areas{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}
+@media (max-width:600px){.areas{grid-template-columns:1fr}}
+.area{
+  display:flex;align-items:center;gap:12px;font:inherit;text-align:left;
+  background:var(--card2);border:1px solid var(--line);border-radius:13px;
+  padding:13px 15px;cursor:pointer;font-size:15px;font-weight:600;color:var(--text);
+  transition:all .15s;
+}
+.area .tick{
+  width:22px;height:22px;border-radius:50%;flex:none;border:2px solid var(--text3);
+  display:grid;place-items:center;font-size:13px;color:#fff;transition:all .15s;
+}
+.area.on{border-color:var(--green);background:var(--green-soft)}
+.area.on .tick{background:var(--green);border-color:var(--green)}
+/* price card */
+.price-hero{
+  margin:20px 0 4px;padding:22px 24px;border-radius:14px;
+  background:var(--accent-soft);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+}
+.price-hero .amount{font-size:42px;font-weight:800;letter-spacing:-.03em;color:var(--accent);font-variant-numeric:tabular-nums}
+.price-hero .per{font-size:15px;color:var(--text2);font-weight:600}
+.price-hero .bname{width:100%;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2)}
+details.crbr{margin-top:18px;border:1px solid var(--line);border-radius:13px;background:var(--card2);max-width:62ch}
+details.crbr summary{cursor:pointer;padding:13px 16px;font-weight:600;font-size:15px;color:var(--accent);list-style:none}
+details.crbr summary::-webkit-details-marker{display:none}
+details.crbr[open] summary{border-bottom:1px solid var(--line2)}
+details.crbr .body{padding:14px 16px;font-size:15px;line-height:1.6;color:var(--text);white-space:pre-wrap}
+.dots{display:flex;gap:6px;margin-top:16px}
+.dots span{width:7px;height:7px;border-radius:50%;background:var(--line);transition:background .2s}
+.dots span.on{background:var(--accent)}
+/* ---------- NOTES ---------- */
+.notes-col{position:sticky;top:84px;display:flex;flex-direction:column;gap:14px}
+.notes{
+  background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+  display:flex;flex-direction:column;max-height:calc(58vh);
+}
+.notes-sms .notes-body{max-height:20vh}
+.notes-body-sms{max-height:30vh}
+.notes-obj{flex:none}
+.obj-chips{display:flex;flex-wrap:wrap;gap:7px;padding:12px 16px}
+.obj-chip{
+  font:inherit;font-size:12.5px;font-weight:600;color:var(--accent);
+  background:var(--accent-soft);border:none;border-radius:999px;
+  padding:6px 12px;cursor:pointer;transition:transform .1s, opacity .15s;
+}
+.obj-chip:hover{opacity:.8}
+.obj-chip:active{transform:scale(.96)}
+.obj-chip.used{color:var(--green);background:var(--green-soft)}
+.obj-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.obj-body{padding:4px 20px 24px;overflow-y:auto}
+.obj-body .obj-answer{
+  font-size:17px;line-height:1.62;padding-left:16px;border-left:3px solid var(--accent);
+  white-space:pre-wrap;max-width:70ch;
+}
+.obj-body .obj-answer .ph{color:var(--accent);font-weight:600}
+.obj-body .obj-hintempty{color:var(--text3);font-size:14px;padding:8px 0 16px}
+.notes-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line2)}
+.notes-head h3{margin:0;font-size:15px;font-weight:700;letter-spacing:-.01em}
+.notes-body{padding:14px 18px;overflow-y:auto;flex:1}
+.notes-body pre{
+  margin:0;font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,monospace;
+  font-size:12.5px;line-height:1.65;white-space:pre-wrap;word-break:break-word;color:var(--text);
+}
+.copy-btn{
+  font:inherit;font-size:13px;font-weight:600;border:none;cursor:pointer;
+  background:var(--accent);color:#fff;border-radius:999px;padding:7px 16px;transition:background .2s, transform .1s;
+}
+.copy-btn:active{transform:scale(.96)}
+.copy-btn.ok{background:var(--green)}
+.copy-sms{background:var(--accent-soft);color:var(--accent)}
+.copy-sms.ok{background:var(--green);color:#fff}
+.fabs{position:fixed;right:16px;bottom:16px;z-index:40;display:none;flex-direction:column;gap:10px;align-items:flex-end}
+@media (max-width:900px){.fabs{display:flex}}
+.fabs.hidden{display:none}
+.mnotes-fab{
+  font:inherit;font-size:15px;font-weight:700;border:none;cursor:pointer;
+  background:var(--accent);color:#fff;border-radius:999px;padding:14px 22px;
+  box-shadow:0 6px 20px rgba(0,0,0,.25);transition:background .2s, transform .1s;
+}
+.mnotes-fab:active{transform:scale(.96)}
+.fab-copy{background:var(--card);color:var(--accent);border:1px solid var(--line)}
+.fab-copy.ok{background:var(--green);color:#fff;border-color:var(--green)}
+.hbtn-copy.ok{color:var(--green)}
+.sheet{position:fixed;inset:0;z-index:50;display:none}
+.sheet.open{display:block}
+.sheet .scrim{position:absolute;inset:0;background:rgba(0,0,0,.4)}
+.sheet .panel{
+  position:absolute;left:0;right:0;bottom:0;max-height:80vh;
+  background:var(--card);border-radius:20px 20px 0 0;display:flex;flex-direction:column;
+  animation:up .28s cubic-bezier(.2,.7,.3,1);
+}
+@keyframes up{from{transform:translateY(30px);opacity:.6}to{transform:none;opacity:1}}
+.grab{width:36px;height:5px;border-radius:3px;background:var(--line);margin:10px auto 0}
+/* ---------- MODAL ---------- */
+.modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:20px}
+.modal.open{display:flex}
+.modal .mscrim{position:absolute;inset:0;background:rgba(0,0,0,.35);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.mdialog{
+  position:relative;background:var(--card);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.35);
+  max-width:340px;width:100%;padding:24px 22px 16px;text-align:center;
+  animation:mpop .22s cubic-bezier(.2,.8,.3,1.1);
+}
+@keyframes mpop{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.mdialog{animation:none}}
+.mdialog h3{margin:0 0 8px;font-size:17px;font-weight:700;letter-spacing:-.01em}
+.mdialog p{margin:0 0 18px;font-size:14px;color:var(--text2);line-height:1.5}
+.mbtns{display:flex;flex-direction:column;gap:8px}
+.mbtn{
+  font:inherit;font-size:16px;font-weight:600;border:none;cursor:pointer;
+  border-radius:12px;padding:12px 16px;transition:opacity .15s, transform .1s;
+}
+.mbtn:active{transform:scale(.98)}
+.mbtn-danger{background:var(--red);color:#fff}
+.mbtn-primary{background:var(--accent);color:#fff}
+.mbtn-cancel{background:var(--card2);color:var(--accent)}
+.mbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.result-pill{
+  display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:700;
+  padding:8px 18px;border-radius:999px;margin:14px 0 4px;
+}
+.result-pill.yes{background:var(--green-soft);color:var(--green)}
+.result-pill.no{background:var(--amber-soft);color:var(--amber);border:1px solid var(--amber-line)}
+.footer-note{margin-top:40px;text-align:center;font-size:12px;color:var(--text3)}
+/* ---------- SETTINGS ---------- */
+.set-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:20px}
+.set-head h2{margin:0;font-size:26px;font-weight:800;letter-spacing:-.02em;flex:1}
+.set-info{
+  margin:0 0 18px;padding:12px 16px;border-radius:12px;background:var(--accent-soft);
+  color:var(--text);font-size:14px;line-height:1.55;
+}
+.set-info code{background:var(--card);padding:1px 7px;border-radius:6px;font-size:13px}
+details.sect{
+  background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+  margin-bottom:14px;overflow:hidden;
+}
+details.sect > summary{
+  cursor:pointer;padding:18px 22px;font-weight:700;font-size:17px;letter-spacing:-.01em;
+  list-style:none;display:flex;align-items:center;gap:10px;
+}
+details.sect > summary::-webkit-details-marker{display:none}
+details.sect > summary .chev{margin-left:auto;color:var(--text3);transition:transform .2s;font-size:14px}
+details.sect[open] > summary .chev{transform:rotate(90deg)}
+details.sect > summary small{font-weight:500;font-size:13px;color:var(--text2)}
+.sect-body{padding:4px 22px 22px;border-top:1px solid var(--line2)}
+.srow{margin-top:16px}
+.srow > label{display:block;font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px}
+.srow textarea{min-height:56px;font-size:14.5px;line-height:1.5}
+.srow input[type=text]{font-size:14.5px}
+.qitem{
+  border:1px solid var(--line);border-radius:14px;background:var(--card2);
+  padding:14px 16px;margin-top:12px;
+}
+.qitem-head{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.qitem-head .qlabel{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text2);flex:1}
+.icobtn{
+  border:none;background:none;cursor:pointer;font-size:14px;color:var(--text2);
+  width:28px;height:28px;border-radius:8px;display:grid;place-items:center;
+}
+.icobtn:hover{background:var(--accent-soft);color:var(--accent)}
+.icobtn.del:hover{background:var(--red-soft);color:var(--red)}
+.icobtn:disabled{opacity:.3;cursor:default}
+.addbtn{
+  margin-top:14px;font:inherit;font-size:14px;font-weight:600;color:var(--accent);
+  background:var(--accent-soft);border:none;border-radius:999px;padding:9px 18px;cursor:pointer;
+}
+.addbtn:hover{opacity:.85}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:600px){.grid2{grid-template-columns:1fr}}
+</style>
+
+<header class="app">
+  <div class="hbar">
+    <div class="brand">M&amp;B Biuro Rachunkowe<small>Skrypt sprzedażowy</small></div>
+    <nav class="phases" id="phases" aria-label="Etapy rozmowy"></nav>
+    <button class="hbtn hbtn-copy" id="copyHeadBtn" type="button">⧉ Kopiuj notatkę</button>
+    <button class="hbtn" id="settingsBtn" type="button">⚙︎ Ustawienia</button>
+    <button class="hbtn" id="resetBtn" type="button">Nowa rozmowa</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <main id="main">
+    <section class="stage" id="stage" aria-live="polite"></section>
+    <aside class="notes-col" id="notesCol">
+      <div class="notes">
+        <div class="notes-head">
+          <h3>Notatka z rozmowy</h3>
+          <button class="copy-btn" id="copyBtn" type="button">Kopiuj</button>
+        </div>
+        <div class="notes-body"><pre id="noteText"></pre></div>
+      </div>
+      <div class="notes notes-sms" id="smsPanel" style="display:none">
+        <div class="notes-head">
+          <h3>SMS do klienta</h3>
+          <button class="copy-btn" id="smsBtn" type="button">Kopiuj SMS</button>
+        </div>
+        <div class="notes-body"><pre id="smsText"></pre></div>
+      </div>
+      <div class="notes notes-obj">
+        <div class="notes-head"><h3>Obiekcje — szybka odpowiedź</h3></div>
+        <div class="obj-chips" id="objChips"></div>
+      </div>
+    </aside>
+  </main>
+  <p class="footer-note">Skrypt wewnętrzny M&amp;B · treści edytowalne w Ustawieniach · wersja 22 (10.08.2026)</p>
+</div>
+
+<div class="fabs" id="fabs">
+  <button class="mnotes-fab fab-copy" id="mObj" type="button">Obiekcje</button>
+  <button class="mnotes-fab fab-copy" id="mCopy" type="button">⧉ Kopiuj</button>
+  <button class="mnotes-fab" id="mFab" type="button">Notatka</button>
+</div>
+
+<div class="sheet" id="objSheet" role="dialog" aria-label="Obiekcje">
+  <div class="scrim" id="objScrim"></div>
+  <div class="panel">
+    <div class="grab"></div>
+    <div class="notes-head"><h3>Obiekcje — kliknij, żeby zobaczyć odpowiedź</h3>
+      <button class="copy-btn" id="objClose" type="button">Zamknij</button></div>
+    <div class="obj-chips" id="objChipsSheet"></div>
+    <div class="obj-body" id="objBody"></div>
+  </div>
+</div>
+<div class="modal" id="modal" role="alertdialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="mscrim" id="mScrim"></div>
+  <div class="mdialog">
+    <h3 id="mTitle"></h3>
+    <p id="mText"></p>
+    <div class="mbtns">
+      <button class="mbtn mbtn-danger" id="mConfirm" type="button"></button>
+      <button class="mbtn mbtn-cancel" id="mCancel" type="button">Anuluj</button>
+    </div>
+  </div>
+</div>
+<div class="sheet" id="sheet" role="dialog" aria-label="Notatka z rozmowy">
+  <div class="scrim" id="scrim"></div>
+  <div class="panel">
+    <div class="grab"></div>
+    <div class="notes-head">
+      <h3>Notatka z rozmowy</h3>
+      <button class="copy-btn" id="copyBtn2" type="button">Kopiuj</button>
+    </div>
+    <div class="notes-body"><pre id="noteText2"></pre></div>
+    <div id="smsMWrap" style="display:none">
+      <div class="notes-head" style="border-top:1px solid var(--line2)">
+        <h3>SMS do klienta</h3>
+        <button class="copy-btn" id="smsBtn2" type="button">Kopiuj SMS</button>
+      </div>
+      <div class="notes-body notes-body-sms"><pre id="smsTextM"></pre></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   DOMYŚLNA KONFIGURACJA — całość treści skryptu.
+   Wszystko poniżej jest edytowalne w panelu Ustawienia.
+   {H} = imię handlowca, {K} = imię klienta.
+   ============================================================ */
+
+const MIEJSCOWOSC_Q = {
+  id:'miejscowosc', type:'city', note:'Miejscowość',
+  speech:`A w jakiej miejscowości działa Pana firma? Pytam, bo współpracujemy z firmami, które pozyskują dla przedsiębiorców dotacje i dofinansowania — a te programy różnią się w zależności od województwa. Jak wiem, skąd Pan jest, mogę sprawdzić, czy w Pana regionie jest teraz otwarty jakiś nabór.`,
+};
+const WOJEWODZTWA = ['dolnośląskie','kujawsko-pomorskie','lubelskie','lubuskie','łódzkie','małopolskie','mazowieckie','opolskie','podkarpackie','podlaskie','pomorskie','śląskie','świętokrzyskie','warmińsko-mazurskie','wielkopolskie','zachodniopomorskie'];
+
+const DEFAULT_CONFIG = {
+  version: 6,
+  intro: {
+    k0: `Dzień dobry, z tej strony {H}, M&B Biuro Rachunkowe. Zostawiono u nas prośbę o kontakt — czy to się zgadza?`,
+    k1a: `W zgłoszeniu mam podane, że mam przyjemność z Panem {K} — czy to się zgadza?`,
+    k1b: `Rozumiem. Proszę powiedzieć, z kim mam przyjemność, żeby lepiej nam się rozmawiało.`,
+    k2: `Panie {K}, w takim razie w czym mogę pomóc?`,
+    k2a: `A czy ma już Pan firmę?`,
+    k2bT: `A jaką działalność Pan prowadzi?`,
+    k2bN: `A jaką działalność planuje Pan założyć?`,
+  },
+  paths: {
+    A: {
+      label: 'Nowa firma — JDG',
+      agree: `Żeby dobrać dla Pana najlepsze rozwiązanie, będę musiał zadać jeszcze parę pytań — dobrze?`,
+      optyTodo: true,
+      questions: [
+        {id:'branza', type:'short', note:'Branża',
+         speech:`W takim razie proszę mi powiedzieć, czym będzie się zajmować Pana działalność?`},
+        MIEJSCOWOSC_Q,
+        {id:'forma', type:'choice', note:'Forma opodatkowania',
+         speech:`Rozumiem, a czy wybrał Pan już najbardziej optymalną formę opodatkowania?`,
+         hint:`Po rozmowie: przekaż dane do działu optymalizacji.`,
+         options:[
+           {label:'TAK — wybrał',
+            noteValue:'wybrana — do bezpłatnej weryfikacji w dziale optymalizacji',
+            followup:`Super, w takim razie od razu bezpłatnie sprawdzimy, czy według naszych wyliczeń ta forma też wychodzi najkorzystniej. Po naszej rozmowie przejdę do działu optymalizacji i dam Panu znać, jak tylko otrzymam wyniki.`},
+           {label:'NIE — nie wybrał',
+            noteValue:'niewybrana — dział optymalizacji dobierze najkorzystniejszą',
+            followup:`W takim razie od razu bezpłatnie sprawdzimy, jaka forma opodatkowania wychodzi najkorzystniej. Po naszej rozmowie przejdę do działu optymalizacji i dam Panu znać, jak tylko otrzymam wyniki.`},
+         ]},
+        {id:'przychody', type:'long', note:'Przychody i koszty',
+         speech:`Jakie ma Pan planowane przychody i koszty?`},
+        {id:'inneZrodla', type:'long', note:'Inne źródła przychodu',
+         speech:`Ok, a czy w bieżącym roku podatkowym osiągnął Pan lub planuje osiągnąć przychód z jakiegoś innego źródła — np. etat, umowa zlecenie albo inne? (jeśli tak — jakie źródła, kwota brutto czy netto)`},
+        {id:'rozliczenie', type:'short', note:'Rozliczenie',
+         speech:`Czy rozlicza się Pan sam, czy z żoną/mężem?`},
+        {id:'dzieci', type:'short', note:'Dzieci',
+         speech:`Czy ma Pan dzieci? Jeśli tak, to ile?`},
+        {id:'dokumenty', type:'short', note:'Dokumenty/mc',
+         speech:`Proszę mi powiedzieć, ilu dokumentów do księgowania spodziewa się Pan miesięcznie?`},
+      ],
+      emp:{speech:`Czy planuje Pan kogoś zatrudnić? Jeśli tak, to ilu pracowników?`},
+    },
+    B: {
+      label: 'Nowa firma — Spółka',
+      agree: `Żeby dobrać dla Pana najlepsze rozwiązanie, będę musiał zadać jeszcze parę pytań — dobrze?`,
+      optyTodo: false,
+      questions: [
+        {id:'branza', type:'short', note:'Branża',
+         speech:`W takim razie proszę mi powiedzieć, czym będzie się zajmować Pana działalność?`},
+        MIEJSCOWOSC_Q,
+        {id:'dokumenty', type:'short', note:'Dokumenty/mc',
+         speech:`Proszę mi powiedzieć, ilu dokumentów do księgowania spodziewa się Pan miesięcznie?`},
+      ],
+      emp:{speech:`Czy planuje Pan kogoś zatrudnić? Jeśli tak, to ilu pracowników?`},
+    },
+    C: {
+      label: 'Przeniesienie — JDG',
+      agree: `Żeby dobrać dla Pana najlepsze rozwiązanie, będę musiał zadać jeszcze parę pytań — dobrze?`,
+      optyTodo: true,
+      questions: [
+        {id:'branza', type:'short', note:'Branża',
+         speech:`Proszę mi powiedzieć, czym zajmuje się Pana działalność?`},
+        MIEJSCOWOSC_Q,
+        {id:'forma', type:'long', note:'Forma opodatkowania',
+         speech:`Jaką formę opodatkowania ma Pan obecnie i kiedy ostatnio była ona sprawdzana pod kątem optymalności?`,
+         after:`W takim razie od razu bezpłatnie sprawdzimy, czy ta forma nadal wychodzi dla Pana najkorzystniej. Po naszej rozmowie przejdę do działu optymalizacji i dam Panu znać, jak tylko otrzymam wyniki.`,
+         hint:`Po rozmowie: przekaż dane do działu optymalizacji.`},
+        {id:'przychody', type:'long', note:'Przychody i koszty',
+         speech:`Jakie ma Pan miesięczne przychody i koszty?`},
+        {id:'inneZrodla', type:'long', note:'Inne źródła przychodu',
+         speech:`Ok, a czy w bieżącym roku podatkowym osiągnął Pan przychód z jakiegoś innego źródła — np. etat, umowa zlecenie albo inne? (jeśli tak — jakie źródła, kwota brutto czy netto)`},
+        {id:'rozliczenie', type:'short', note:'Rozliczenie',
+         speech:`Czy rozlicza się Pan sam, czy z żoną/mężem?`},
+        {id:'dzieci', type:'short', note:'Dzieci',
+         speech:`Czy ma Pan dzieci? Jeśli tak, to ile?`},
+        {id:'dokumenty', type:'short', note:'Dokumenty/mc',
+         speech:`Ile dokumentów do księgowania ma Pan średnio miesięcznie?`},
+      ],
+      emp:{speech:`Czy zatrudnia Pan pracowników? Jeśli tak, to ilu?`},
+    },
+    D: {
+      label: 'Przeniesienie — Spółka',
+      agree: `Żeby dobrać dla Pana najlepsze rozwiązanie, będę musiał zadać jeszcze parę pytań — dobrze?`,
+      optyTodo: false,
+      questions: [
+        {id:'branza', type:'short', note:'Branża',
+         speech:`Proszę mi powiedzieć, czym zajmuje się Pana spółka?`},
+        MIEJSCOWOSC_Q,
+        {id:'dokumenty', type:'short', note:'Dokumenty/mc',
+         speech:`Ile dokumentów do księgowania ma Pan średnio miesięcznie?`},
+      ],
+      emp:{speech:`Czy zatrudnia Pan pracowników? Jeśli tak, to ilu?`},
+    },
+  },
+  wspolne: {
+    w1: `Panie {K}, już wiem zdecydowanie więcej. Teraz ważne pytanie — na czym Panu najbardziej zależy we współpracy z biurem rachunkowym?`,
+    w2: `Panie {K}, a gdyby ta współpraca miała być jeszcze lepsza, to co mógłby Pan jeszcze wymienić?`,
+    w3: `Czyli rozumiem, że najbardziej zależy Panu na: [obszary] — czy to się zgadza?`,
+    w3hint: `Wymień wszystkie zaznaczone obszary po kolei. Poczekaj na potwierdzenie klienta.`,
+    w4intro: `Zależy Panu na: [obszar] — u nas wygląda to tak:`,
+    closingQ: `Czy takie rozwiązanie jest tym, czego Pan szuka?`,
+    w5: `Panie {K}, co Pan o tym myśli i czy coś wymaga jeszcze doprecyzowania?`,
+    w6cena: `Właśnie się do tego przymierzałem. Mam dla Pana wycenę gotową — powiem Panu, jak to u nas wygląda.`,
+    w6jasne: `Cieszę się, że wszystko jest dla Pana klarowne. W takim razie chciałbym Panu jeszcze pokazać, jak wygląda nasza współpraca od strony rozliczenia, żeby miał Pan pełen obraz.`,
+  },
+  areas: [
+    {id:'doradztwo', label:'Doradztwo',
+     answer:`Wie Pan, jak to zwykle wygląda: ktoś przeczyta na Facebooku, że estoński CIT albo ryczałt to złoto, i myśli sobie — ciekawe, jakby to wyszło u mnie. I na tym się kończy, bo trzeba dzwonić do księgowej, umawiać się, czekać. U nas pyta Pan o to asystenta AI w aplikacji i od razu dostaje odpowiedź policzoną na danych Pana firmy. A do tego mamy na pokładzie doradcę podatkowego — raz w roku, przed okienkiem na zmianę formy opodatkowania, sam wraca do Pana sytuacji i sprawdza, czy nie może Pan płacić mniej. I powiem szczerze — robimy to bo im mniej Pan płaci podatków, tym lepiej Panu idzie i tym dłużej Pan z nami zostaje, więc oboje mamy w tym interes.`},
+    {id:'kontakt', label:'Stały kontakt',
+     answer:`Klienci rzadko zmieniają biuro przez cenę — najczęściej przez frustrację: dzwoni się, trafia na kogoś nowego, tłumaczy wszystko od początku i czeka. U nas większość spraw załatwia Pan sam w panelu — faktury, podatki, dokumenty jednym zdjęciem, terminy — zanim w ogóle trzeba do kogoś dzwonić. Jak potrzebny jest człowiek, jest biuro obsługi klienta, dostępne od ręki, bez kolejki. A do tematów, które wymagają znajomości Pana firmy — dedykowana księgowa, która zna Pana kontekst od pierwszego dnia.`},
+    {id:'proaktywnosc', label:'Proaktywność księgowych',
+     answer:`W większości biur to Pan musi pilnować, co się zmienia — Pan pyta, biuro odpowiada. U nas jest odwrotnie: jeśli wchodzą przepisy, które dotyczą Pana firmy, dowiaduje się Pan od nas, zanim staną się problemem. A w tle asystent AI na bieżąco analizuje dane Pana firmy i automatycznie daje znać księgowej, kiedy coś wymaga reakcji. Czyli pilnują Pana dwie pary oczu — ludzka i taka, która nie śpi.`},
+    {id:'start', label:'Wsparcie na start działalności',
+     answer:`Firmę może Pan zakładać sam — albo może to zrobić za Pana ktoś, kto robi to codziennie. CEIDG, ZUS, VAT, forma opodatkowania — bierzemy to na siebie na podstawie pełnomocnictwa. Pan nie stoi w kolejkach i nie wypełnia formularzy; my prowadzimy Pana krok po kroku i sami dopytujemy, gdy coś wymaga wyjaśnienia. Krótko mówiąc: my ogarniamy formalności, Pan ogarnia biznes.`},
+    {id:'wygoda', label:'Wygoda i prostota współpracy',
+     answer:`Zna Pan ten rytuał: raz w miesiącu zebrać faktury, poskanować, wysłać mailem i czekać na potwierdzenie, że doszły. U nas robi Pan zdjęcie dokumentu telefonem i koniec — leci prosto do księgowej, bez maili i segregatorów. A w aplikacji ma Pan wszystko w jednym miejscu: finanse na bieżąco, wystawianie faktur, podatki do sprawdzenia i opłacenia. Całość jest ułożona tak, żeby Pan prowadził firmę, a nie papiery.`},
+    {id:'terminowosc', label:'Terminowość',
+     answer:`Tu jedno przeoczenie — deklaracja, składka ZUS, cokolwiek — kosztuje realne pieniądze, nie tylko nerwy. Dlatego u nas terminów pilnuje aplikacja, która przypomina o każdym z nich, i księgowa, której przy Pana terminie odpala się alert na pół ekranu — takiego się po prostu nie da przeoczyć. Efekt? Nasz wskaźnik błędów to dwanaście setnych procenta.`},
+    {id:'optymalizacja', label:'Niższe podatki / optymalizacja',
+     answer:`Powiem Panu wprost, dlaczego zależy nam, żeby płacił Pan jak najmniej podatków: im lepiej Panu idzie, tym dłużej jest Pan z nami. Trzymamy kciuki, ale nie bezinteresownie — i właśnie dlatego może Pan nam ufać. Nasz doradca podatkowy raz w roku, przed okienkiem na zmianę formy opodatkowania, wraca do Pana sytuacji i sprawdza, czy nie da się płacić mniej. Nie z uprzejmości — z wzajemnej korzyści.`},
+    {id:'bezpieczenstwo', label:'Bezpieczeństwo i zgodność z przepisami',
+     answer:`Każde biuro powie Panu, że dba o Pana bezpieczeństwo. Ja Panu powiem z czego to wynika: firma z problemami podatkowymi to firma, która za chwilę nie ma nam czym zapłacić. Więc jak przychodzi pismo z urzędu, przesyła je Pan nam — my piszemy odpowiedź, robimy odwołanie, kontaktujemy się z urzędem w Pana imieniu. Na trudniejsze sprawy mamy własną kancelarię prawną. Motywacja prosta i finansowa — i dlatego może Pan na nas liczyć.`},
+    {id:'branza', label:'Specyfika branży',
+     answer:`Słusznie Pan o to pyta — branża ma znaczenie. Dlatego nie trafia Pan do przypadkowej osoby: księgową dobieramy pod kątem Pana branży, a przed startem robimy pełne wdrożenie, żeby rozumiała Pana model biznesowy od pierwszego dnia — a nie uczyła się go przez rok na Pana koszt. Zresztą mamy w tym interes: biuro, które nie rozumie branży klienta, prędzej czy później robi błąd, a klient z problemami odchodzi. Wolimy, żeby Pan został.`},
+  ],
+  objections: [
+    {id:'zastanowie', label:'Jeszcze się zastanowię',
+     answer:`Jasne, rozumiem. Tylko powiem Panu szczerze — kiedy klient mówi „zastanowię się", to w dziewięciu przypadkach na dziesięć znaczy, że czegoś mu jeszcze brakuje do decyzji, tylko nie chce powiedzieć wprost. A ja wolę to usłyszeć teraz niż stracić Pana przez niedomówienie. Co konkretnie budzi Pana wątpliwość — cena, zakres, coś jeszcze innego? Jeśli to coś, co da się wyjaśnić w dwie minuty, szkoda, żeby blokowało Panu księgowość na kolejne tygodnie.`},
+    {id:'obecne-biuro', label:'Muszę pogadać z obecnym biurem',
+     answer:`Oczywiście, to fair wobec nich. Jedna rzecz z doświadczenia: takie rozmowy najczęściej kończą się obietnicą poprawy — i przez miesiąc faktycznie jest lepiej, a potem wszystko wraca do normy, bo problem nie leży w chęciach, tylko w sposobie pracy biura. My nie wymagamy od Pana zrywania niczego z dnia na dzień — całe przeniesienie, łącznie z odbiorem dokumentów, bierzemy na siebie. Więc może zróbmy tak: umówimy wstępnie termin, a jeśli po tamtej rozmowie zmieni Pan zdanie, po prostu da mi Pan znać. Nic Pana to nie kosztuje, a kalendarz nie ucieka.`},
+    {id:'cena', label:'Za wysoka cena',
+     answer:`Rozumiem. Tylko porównajmy, co dokładnie Pan porównuje — bo samo „księgowanie dokumentów" to najmniejsza część tego, za co Pan płaci. W abonamencie ma Pan dedykowaną księgową, dział obsługi bez kolejki, aplikację, pilnowanie wszystkich terminów i dział optymalizacji, który raz w roku, kiedy otwiera się okienko na zmianę formy opodatkowania, sprawdza, czy nie może Pan płacić niższych podatków. Jedna dobrze wykorzystana optymalizacja albo jeden uniknięty błąd potrafi zwrócić roczny koszt naszej pracy z nawiązką. Tańsze biuro, które tego nie robi, jest tańsze tylko na fakturze — nie w Pana wyniku finansowym.`},
+    {id:'lokalne', label:'Wolałbym biuro lokalne',
+     answer:`Rozumiem to podejście — kiedyś bliskość biura naprawdę miała znaczenie, bo dokumenty woziło się w teczce. Dziś dokument to zdjęcie w telefonie, a kontakt z księgową ma Pan szybszy niż z biurem po drugiej stronie ulicy — bez jeżdżenia i bez łapania kogoś w godzinach otwarcia. I powiem szczerze: lokalne biuro to najczęściej jedna osoba — jak choruje albo jedzie na urlop, Pana sprawy czekają. U nas Pana firmę zna dedykowana księgowa, a obok niej stoi cały dział obsługi, więc zawsze jest ktoś, kto przejmie temat od ręki.`},
+    {id:'spotkanie', label:'Najpierw spotkanie z księgową',
+     answer:`Rozumiem potrzebę poznania osoby, która poprowadzi Pana firmę — i dokładnie temu służy nasz onboarding. To spotkanie, na którym dział obsługi przechodzi z Panem przez wszystko: portale, pełnomocnictwa, sposób pracy. A księgową, która Pana prowadzi, ma Pan potem pod ręką na co dzień, nie tylko na jednym spotkaniu. Różnica jest taka, że u nas ta rozmowa odbywa się już konkretnie na Pana firmie, nie teoretycznie. Więc zamiast dokładać sobie dodatkowe spotkanie „na sucho", proponuję umówić onboarding — pozna Pan i księgową, i sposób, w jaki pracujemy, od razu w działaniu.`},
+  ],
+  prices: {
+    b1:{name:'Blok 1 · JDG bez pracowników', amount:'299 zł', per:'netto miesięcznie',
+        speech:`W przypadku Pana firmy to będzie 299 złotych netto miesięcznie — w pakiecie 5 dokumentów księgowych, a każdy kolejny to 8 złotych netto.`,
+        note:'299 zł netto/mc (5 dok. w pakiecie, kolejny 8 zł netto)'},
+    b2:{name:'Blok 2 · JDG z pracownikami', amount:'299 zł', per:'netto miesięcznie + kadry',
+        speech:`W przypadku Pana firmy to będzie 299 złotych netto miesięcznie — w pakiecie 5 dokumentów księgowych, a każdy kolejny to 8 złotych netto. Do tego obsługa kadrowa: umowa zlecenie dla studenta poniżej 26. roku życia to 69 złotych netto miesięcznie za osobę, pozostałe umowy to 79 złotych netto miesięcznie za osobę.`,
+        note:'299 zł netto/mc (5 dok., kolejny 8 zł netto) + kadry: student <26 — 69 zł netto/os./mc, pozostali — 79 zł netto/os./mc'},
+    b3:{name:'Blok 3 · Nowa spółka bez pracowników', amount:'649 zł', per:'netto miesięcznie + rejestracja',
+        speech:`W przypadku Pana firmy to będzie 649 złotych netto miesięcznie — w pakiecie 5 dokumentów księgowych, a każdy kolejny to 12 złotych netto. Do tego dochodzi jednorazowa opłata za rejestrację spółki — bez wpisu do CRBR to 1 050 złotych netto, a z wpisem do CRBR 1 300 złotych netto.`,
+        note:'649 zł netto/mc (5 dok., kolejny 12 zł netto) + rejestracja spółki: 1 050 zł netto bez CRBR / 1 300 zł netto z CRBR'},
+    b4:{name:'Blok 4 · Nowa spółka z pracownikami', amount:'649 zł', per:'netto miesięcznie + kadry + rejestracja',
+        speech:`W przypadku Pana firmy to będzie 649 złotych netto miesięcznie — w pakiecie 5 dokumentów księgowych, a każdy kolejny to 12 złotych netto. Do tego obsługa kadrowa: umowa zlecenie dla studenta poniżej 26. roku życia to 69 złotych netto miesięcznie za osobę, pozostałe umowy to 79 złotych netto miesięcznie za osobę. I jednorazowa opłata za rejestrację spółki — bez wpisu do CRBR to 1 050 złotych netto, a z wpisem do CRBR 1 300 złotych netto.`,
+        note:'649 zł netto/mc (5 dok., kolejny 12 zł netto) + kadry: 69/79 zł netto/os./mc + rejestracja spółki: 1 050 zł netto / 1 300 zł netto (z CRBR)'},
+    b5:{name:'Blok 5 · Przenoszona spółka bez pracowników', amount:'649 zł', per:'netto miesięcznie',
+        speech:`W przypadku Pana firmy to będzie 649 złotych netto miesięcznie — w pakiecie 5 dokumentów księgowych, a każdy kolejny to 12 złotych netto.`,
+        note:'649 zł netto/mc (5 dok., kolejny 12 zł netto)'},
+    b6:{name:'Blok 6 · Przenoszona spółka z pracownikami', amount:'649 zł', per:'netto miesięcznie + kadry',
+        speech:`W przypadku Pana firmy to będzie 649 złotych netto miesięcznie — w pakiecie 5 dokumentów księgowych, a każdy kolejny to 12 złotych netto. Do tego obsługa kadrowa: umowa zlecenie dla studenta poniżej 26. roku życia to 69 złotych netto miesięcznie za osobę, pozostałe umowy to 79 złotych netto miesięcznie za osobę.`,
+        note:'649 zł netto/mc (5 dok., kolejny 12 zł netto) + kadry: student <26 — 69 zł netto/os./mc, pozostali — 79 zł netto/os./mc'},
+    crbr:`Centralny Rejestr Beneficjentów Rzeczywistych — państwowy rejestr właścicieli spółek. Każda nowa spółka ma tylko 7 dni na wpis, a brak wpisu to realne ryzyko kary nawet do miliona złotych. Nie jest to coś, o czym warto zapomnieć na starcie — dlatego mamy to w ofercie jako osobną pozycję, żeby Pan miał to z głowy od pierwszego dnia.`,
+  },
+  sms: {
+    main:`Dzień dobry Panie {K}, dziękuję za rozmowę i potwierdzam termin onboardingu: [termin]. Spotkanie potrwa ok. 1 h — proszę być wtedy przy komputerze. Przypominam też o opłacie aktywacyjnej 100 zł — znika, jeśli onboarding odbędzie się sprawnie w pierwszym umówionym terminie.`,
+    pelnomocnictwa:`Prześlemy Panu instrukcję złożenia pełnomocnictw — najlepiej zrobić to przed spotkaniem.`,
+    kontoUS:`Prześlemy też instrukcję założenia konta organizacji w Urzędzie Skarbowym — ważne, żeby konto było założone jeszcze przed onboardingiem, bez niego nie złożymy pełnomocnictw.`,
+    miesiac:`Księgowanie zaczynamy od: [miesiąc].`,
+    koniec:`W razie pytań jestem pod tym numerem. Pozdrawiam, [imię], M&B Biuro Rachunkowe.`,
+  },
+  closing: {
+    close:`Panie {K}, to co — działamy?`,
+    gratulacje:`Dobra decyzja, Panie {K} — i mówię to nie dlatego, że tak wypada, tylko dlatego, że naprawdę wierzę, że możemy zawiązać tutaj fajną, długą współpracę. Teraz przejdziemy przez kilka kroków razem — proszę mi mówić, co Pan widzi na ekranie, a ja Pana poprowadzę.`,
+    sms:`Świetnie, Panie {K} — w takim razie właśnie wysłałem Panu link do rozpoczęcia współpracy. Niech Pan sprawdzi, czy SMS dotarł.`,
+    smsFixHint:`Działaj samodzielnie, żeby SMS dotarł do klienta (sprawdź numer, wyślij ponownie). Kontynuuj dopiero, gdy klient potwierdzi.`,
+    form:`Świetnie — teraz przejdziemy przez kilka kroków razem. Proszę mi mówić, co Pan widzi na ekranie, a ja Pana poprowadzę.`,
+    z1:`Panie {K}, widzę umowę — wszystko gra. To teraz od razu umówimy termin Pana onboardingu. Standardowo pobieramy opłatę aktywacyjną w wysokości 100 złotych — jednak jeśli przeprowadzimy onboarding sprawnie w pierwszym umówionym terminie, ta opłata znika. Dlatego proszę wybrać bezpieczny termin, w którym na pewno będzie Pan dostępny i przy komputerze. Oczywiście rozumiemy, że różne sytuacje się zdarzają — gdyby cokolwiek miało się zmienić lub coś wypaść, prosimy o informację możliwie jak najwcześniej.`,
+    z1a:`Patrząc na dostępne terminy, mógłbym Panu zaproponować [termin] — czy taki termin Panu pasuje?`,
+    z1b:`Rozumiem. W takim razie mam jeszcze [kolejny termin] — czy ten by Panu odpowiadał?`,
+    z1bHint:`Proponuj kolejne wolne terminy pojedynczo, aż klient wybierze pasujący.`,
+    miesiacQ:`I jeszcze jedno — od którego miesiąca mamy przejąć księgowanie: czy zależy Panu, żebyśmy zaksięgowali już bieżący miesiąc?`,
+    szostyDzien:`Tu jedna ważna rzecz, o której uczciwie uprzedzam: dokumenty za dany miesiąc musimy mieć do 6. dnia miesiąca. Skoro startujemy później, ten pierwszy miesiąc zaksięgujemy — natomiast nie będzie to możliwe terminowo. Możemy to zrobić, chcę tylko, żeby Pan o tym wiedział z góry.`,
+    z2:`Zanim się rozłączymy, chcę Panu jeszcze w skrócie powiedzieć, jak będzie wyglądał sam onboarding, żeby nic Pana nie zaskoczyło. Po pierwsze — na spotkaniu będzie Pan potrzebował dostępu do komputera i możliwości udostępnienia ekranu. Na samym onboardingu dział obsługi klienta przejdzie z Panem przez kwestie organizacyjne związane z rozpoczęciem współpracy — między innymi złożą Państwo pełnomocnictwa i pokaże Panu portale, z których będzie Pan u nas korzystał.`,
+    z3:`Jeśli chodzi o same pełnomocnictwa — może Pan wybrać: albo prześlemy Panu instrukcję i złoży je Pan sam przed spotkaniem, albo przejdą Państwo przez to wspólnie na spotkaniu. Jak Panu wygodniej?`,
+    z4:`Jeszcze jedno przy spółce — czy posiada Pan konto organizacji w Urzędzie Skarbowym?`,
+    z4n:`Nic nie szkodzi — prześlemy Panu instrukcję, jak je założyć, i bardzo proszę o założenie go jeszcze przed spotkaniem. To ważne, bo bez tego konta nie da się złożyć pełnomocnictw podczas onboardingu.`,
+    z5:`No i jeszcze dokumenty od Pana obecnego biura rachunkowego — tutaj ma Pan dwie opcje. Albo prześlemy Panu listę dokumentów, których potrzebujemy, a Pan dopilnowuje, żeby wszystko do nas trafiło — albo zleca to Pan nam i wtedy my zajmujemy się pozyskaniem dokumentów, a koszt to 100 złotych netto. Jak Pan woli?`,
+    z5z:`Świetnie, w takim razie zajmiemy się tym za Pana. Będę potrzebował numeru telefonu oraz maila do Pana poprzedniego biura rachunkowego. Czy może mi Pan podać te dane od razu?`,
+    z5u:`Nie ma problemu. W takim razie umówmy się konkretnie — kiedy będzie Pan mógł przesłać nam te dane? Podam Panu SMS-em maila, na który je Pan wyśle.`,
+    z5uHint:`Ustal konkretną datę i godzinę przesłania danych. Wyślij klientowi SMS-em adres mailowy, na który ma przesłać numer i mail poprzedniego biura.`,
+    z6:`Jeśli w międzyczasie pojawi się jakiekolwiek pytanie, dalej jestem dla Pana dostępny, możemy się dzwonić. Czy wszystko jest dla Pana jasne i zrozumiałe?`,
+    end:`Dziękuję ślicznie Panu za rozmowę i w razie czego jestem pod telefonem dla Pana dostępny.`,
+  },
+};
+
+/* ================= CONFIG STORAGE ================= */
+
+const CFG_KEY = 'mb_script_config_v2';
+let CFG;
+function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
+function loadConfig(){
+  try{
+    const raw = localStorage.getItem(CFG_KEY);
+    if(raw){
+      const saved = JSON.parse(raw);
+      // nowa wersja zatwierdzonych treści unieważnia lokalne edycje
+      if(saved.version !== DEFAULT_CONFIG.version) return deepClone(DEFAULT_CONFIG);
+      const base = deepClone(DEFAULT_CONFIG);
+      // płytki merge sekcji + zachowanie zapisanych tablic/obiektów
+      for(const k of Object.keys(base)){
+        if(saved[k] !== undefined){
+          if(Array.isArray(base[k])) base[k] = saved[k];
+          else if(typeof base[k] === 'object') base[k] = Object.assign(base[k], saved[k]);
+          else base[k] = saved[k];
+        }
+      }
+      return base;
+    }
+  }catch(e){}
+  return deepClone(DEFAULT_CONFIG);
+}
+function saveConfig(){ try{ localStorage.setItem(CFG_KEY, JSON.stringify(CFG)); }catch(e){} }
+function resetConfig(){ CFG = deepClone(DEFAULT_CONFIG); saveConfig(); }
+function cfgGet(path){ return path.split('.').reduce((o,k)=>o?.[k], CFG); }
+function cfgSet(path, val){
+  const ks = path.split('.'); const last = ks.pop();
+  let o = CFG; for(const k of ks){ o = o[k]; }
+  o[last] = val;
+  saveConfig();
+}
+
+/* ================= STATE ================= */
+
+const PHASES = ['Start','Wywiad','Priorytety','Prezentacja','Wycena','Zamknięcie'];
+let S;
+function freshState(){
+  return {
+    handlowiec:'', hasName:null, clientName:'', gender:'m', genderManual:false,
+    path:null, answers:{}, qIdx:0, pqFollow:null,
+    priorities:[], areaIdx:0,
+    emp:null, empCount:'',
+    reakcja:'', priceOverride:null,
+    objectionsRaised:[], currentObjection:null, info6:false,
+    wynik:null, termin:'', pelnomocnictwa:'', kontoUS:'',
+    dokPoprzednie:'', popTel:'', popMail:'', popTermin:'', z6:'',
+    step:'setup', history:[], settingsReturn:null,
+  };
+}
+function save(){ try{ localStorage.setItem('mb_script_state', JSON.stringify(S)); }catch(e){} }
+function load(){
+  try{
+    const raw = localStorage.getItem('mb_script_state');
+    if(raw){ return Object.assign(freshState(), JSON.parse(raw)); }
+  }catch(e){}
+  return freshState();
+}
+
+/* ================= HELPERS ================= */
+
+const $ = sel => document.querySelector(sel);
+function esc(s){ return String(s??'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* ---------- Pan/Pani + odmiana imion ---------- */
+
+const MALE_A_NAMES = ['kuba','barnaba','kosma','bonawentura'];
+function detectGender(name){
+  const n = (name||'').trim().toLowerCase();
+  if(!n) return 'm';
+  return (n.endsWith('a') && !MALE_A_NAMES.includes(n)) ? 'f' : 'm';
+}
+const NAME_EXC = {
+  kacper:{voc:'Kacprze', instr:'Kacprem'},
+  ola:{voc:'Olu'}, ula:{voc:'Ulu'}, jola:{voc:'Jolu'}, wiola:{voc:'Wiolu'},
+};
+function declineName(raw, gender){
+  const n = (raw||'').trim();
+  if(!n) return null;
+  const low = n.toLowerCase();
+  let voc = n, instr = n;
+  if(gender==='f'){
+    if(low.endsWith('a')){
+      instr = n.slice(0,-1)+'ą';
+      if(/(sia|cia|zia|dzia)$/.test(low)) voc = n.slice(0,-1)+'u';
+      else if(/nia$/.test(low)) voc = (low.length<=5) ? n.slice(0,-1)+'u' : n.slice(0,-1)+'o';
+      else if(/la$/.test(low) && low.length<=4) voc = n.slice(0,-1)+'u';
+      else voc = n.slice(0,-1)+'o';
+    }
+  } else {
+    if(low.endsWith('ek')){ const s=n.slice(0,-2); voc=s+'ku'; instr=s+'kiem'; }
+    else if(low.endsWith('eł')){ const s=n.slice(0,-2); voc=s+'le'; instr=s+'łem'; }
+    else if(low.endsWith('ał')){ voc=n.slice(0,-1)+'le'; instr=n+'em'; }
+    else if(low.endsWith('a')){ voc=n.slice(0,-1)+'o'; instr=n.slice(0,-1)+'ą'; }
+    else if(/(sz|cz|rz|ż|j|l|ń)$/.test(low)){ voc=n+'u'; instr=n+'em'; }
+    else if(/[kg]$/.test(low)){ voc=n+'u'; instr=n+'iem'; }
+    else if(/(ch|h)$/.test(low)){ voc=n+'u'; instr=n+'em'; }
+    else if(low.endsWith('r')){ voc=n+'ze'; instr=n+'em'; }
+    else if(low.endsWith('t')){ voc=n.slice(0,-1)+'cie'; instr=n+'em'; }
+    else if(low.endsWith('d')){ voc=n+'zie'; instr=n+'em'; }
+    else if(/[yi]$/.test(low)){ voc=n; instr=n+'m'; }
+    else if(/[bfmnpsvwz]$/.test(low)){ voc=n+'ie'; instr=n+'em'; }
+    else { voc=n; instr=n; }
+  }
+  const exc = NAME_EXC[low] || {};
+  return {nom:n, voc:exc.voc||voc, instr:exc.instr||instr};
+}
+
+/* Transformacja tekstu na formy żeńskie (Pani).
+   Działa na słowach: mapy form "Pan*" + słownik końcówek czasowników
+   w oknie ±(2,6) słów wokół zwrotu grzecznościowego. */
+const PAN_MAP = {Pan:'Pani', Panu:'Pani', Panem:'Panią', Panie:'Pani'};
+const GEN_PREV = ['dla','do','u','od','według','wobec','bez','obok','koło','zamiast','oprócz'];
+const ACC_PREV = ['za','umawiamy','kosztuje','przeprowadzamy','zapraszamy','prosimy','poprowadzę','przeprowadzi','witam'];
+const ACC_NEXT = ['przez','z','ze','o','i','a','oraz','na','po','w','zna','poprowadzę','poprowadzi','to','nie','nic','tego'];
+const FEM_DICT = {
+  wybrał:'wybrała', osiągnął:'osiągnęła', mógłby:'mogłaby', mógł:'mogła',
+  musiał:'musiała', miał:'miała', potrzebował:'potrzebowała', korzystał:'korzystała',
+  dostępny:'dostępna', sam:'sama', gotowy:'gotowa', pewny:'pewna', pewien:'pewna',
+  chciał:'chciała', chciałby:'chciałaby', wolał:'wolała', wolałby:'wolałaby',
+  planował:'planowała', przesłał:'przesłała', wysłał:'wysłała', został:'została',
+  zdecydował:'zdecydowała', prowadził:'prowadziła', widział:'widziała',
+  zobaczył:'zobaczyła', zdążył:'zdążyła', zapomniał:'zapomniała', podał:'podała',
+  płacił:'płaciła', płaciłby:'płaciłaby', zapłacił:'zapłaciła', wybierał:'wybierała',
+};
+function toFemale(text){
+  const parts = String(text).split(/([\p{L}]+|\{[KH]\})/u);
+  const wordPos = []; // indeksy tokenów będących słowami
+  parts.forEach((tok,i)=>{ if(/^[\p{L}]+$/u.test(tok)) wordPos.push(i); });
+  const panWordIdx = []; // pozycje (w wordPos) zwrotów Pan*
+  wordPos.forEach((ti,wi)=>{
+    const w = parts[ti];
+    if(PAN_MAP[w]){ parts[ti] = PAN_MAP[w]; panWordIdx.push(wi); }
+    else if(w==='Pana'){
+      const prev = (parts[wordPos[wi-1]]||'').toLowerCase();
+      const next = (parts[wordPos[wi+1]]||'').toLowerCase();
+      let out;
+      if(GEN_PREV.includes(prev)) out='Pani';
+      else if(ACC_PREV.includes(prev)) out='Panią';
+      else if(!next || ACC_NEXT.includes(next)) out='Panią';
+      else out='Pani';
+      parts[ti] = out; panWordIdx.push(wi);
+    }
+  });
+  panWordIdx.forEach(wi=>{
+    for(let j=Math.max(0,wi-2); j<=Math.min(wordPos.length-1,wi+6); j++){
+      const ti = wordPos[j]; const w = parts[ti];
+      const lw = w.toLowerCase();
+      if(FEM_DICT[lw] && !PAN_MAP[w] && w!=='Pana'){
+        const f = FEM_DICT[lw];
+        parts[ti] = (w[0]===w[0].toUpperCase()) ? f[0].toUpperCase()+f.slice(1) : f;
+      }
+    }
+  });
+  return parts.join('');
+}
+
+function fill(text){
+  let t = String(text??'');
+  if(S.gender==='f') t = toFemale(t);
+  t = esc(t);
+  const d = S.clientName ? declineName(S.clientName, S.gender) : null;
+  const ph = v => `<span class="ph">${esc(v)}</span>`;
+  const nameOr = f => d ? ph(d[f]) : ph('[imię klienta]');
+  t = t.replace(/(Panem|Panią)( )\{K\}/g, (m,p,sp)=>p+sp+nameOr('instr'));
+  t = t.replace(/(Panie|Pani)( )\{K\}/g, (m,p,sp)=>p+sp+nameOr('voc'));
+  t = t.replace(/\{K\}/g, nameOr('nom'));
+  t = t.replace(/\{H\}/g, ph('[Twoje imię]'));
+  return t;
+}
+
+/* termin z kalendarza (datetime-local) → "czwartek 30.07.2026, 14:00" */
+const DNI = ['niedziela','poniedziałek','wtorek','środa','czwartek','piątek','sobota'];
+function fmtTermin(raw){
+  if(!raw) return '';
+  const d = new Date(raw);
+  if(isNaN(d)) return raw;
+  const p = n => String(n).padStart(2,'0');
+  return `${DNI[d.getDay()]} ${p(d.getDate())}.${p(d.getMonth()+1)}.${d.getFullYear()}, ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+/* wersja tekstowa (bez HTML) — do SMS-a */
+function fillText(text){
+  let t = String(text??'');
+  if(S.gender==='f') t = toFemale(t);
+  const d = S.clientName ? declineName(S.clientName, S.gender) : null;
+  const nameOr = f => d ? d[f] : '[imię klienta]';
+  t = t.replace(/(Panem|Panią)( )\{K\}/g, (m,p,sp)=>p+sp+nameOr('instr'));
+  t = t.replace(/(Panie|Pani)( )\{K\}/g, (m,p,sp)=>p+sp+nameOr('voc'));
+  t = t.replace(/\{K\}/g, nameOr('nom'));
+  t = t.replace(/\{H\}/g, '[imię]');
+  return t;
+}
+
+function buildSms(){
+  const parts = [];
+  parts.push(fillText(CFG.sms.main).replace('[termin]', S.termin || '[termin]'));
+  if(S.pelnomocnictwa.startsWith('sam')) parts.push(fillText(CFG.sms.pelnomocnictwa));
+  if(S.kontoUS.startsWith('brak')) parts.push(fillText(CFG.sms.kontoUS));
+  if(S.answers.pierwszyMiesiac) parts.push(fillText(CFG.sms.miesiac).replace('[miesiąc]', S.answers.pierwszyMiesiac));
+  parts.push(fillText(CFG.sms.koniec));
+  return parts.join(' ');
+}
+
+/* modal potwierdzenia (window.confirm jest zablokowany w sandboxie artefaktu) */
+function showModal({title, text, confirmLabel, onConfirm, primary=false}){
+  const m = $('#modal');
+  $('#mTitle').textContent = title;
+  $('#mText').textContent = text;
+  const c = $('#mConfirm');
+  c.textContent = confirmLabel;
+  c.classList.toggle('mbtn-danger', !primary);
+  c.classList.toggle('mbtn-primary', primary);
+  const close = ()=>{ m.classList.remove('open'); c.onclick = null; };
+  c.onclick = ()=>{ close(); onConfirm(); };
+  $('#mCancel').onclick = close;
+  $('#mScrim').onclick = close;
+  m.classList.add('open');
+  c.focus();
+}
+
+/* potwierdzenie inline dla małych przycisków (usuwanie w edytorze) */
+function armConfirm(btn, label, fn){
+  if(btn.dataset.armed){
+    delete btn.dataset.armed;
+    btn.textContent = btn.dataset.orig;
+    btn.classList.remove('armed');
+    fn();
+    return;
+  }
+  btn.dataset.armed = '1';
+  btn.dataset.orig = btn.textContent;
+  btn.textContent = label;
+  btn.classList.add('armed');
+  setTimeout(()=>{
+    if(btn.dataset.armed && document.contains(btn)){
+      delete btn.dataset.armed;
+      btn.textContent = btn.dataset.orig;
+      btn.classList.remove('armed');
+    }
+  }, 2600);
+}
+function go(id){
+  S.history.push(S.step);
+  S.step = id;
+  save(); render();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function back(){
+  if(S.history.length){ S.step = S.history.pop(); save(); render(); }
+}
+function priceBlockId(){
+  const emp = S.priceOverride !== null ? S.priceOverride : !!S.emp;
+  if(S.path==='A'||S.path==='C') return emp ? 'b2' : 'b1';
+  if(S.path==='B') return emp ? 'b4' : 'b3';
+  if(S.path==='D') return emp ? 'b6' : 'b5';
+  return 'b1';
+}
+function afterZ3(){ return (S.path==='B'||S.path==='D') ? 'z4' : afterZ4(); }
+function afterZ4(){ return (S.path==='C'||S.path==='D') ? 'z5' : 'z6'; }
+
+/* ================= STEP DEFINITIONS =================
+   speech może być stringiem lub funkcją () => tekst z CFG. */
+
+function sp(fn){ return fn; } // czytelnik: speech z configu
+
+const STEPS = {
+  setup:{phase:0, tag:'Setup', title:'Przygotowanie do rozmowy', custom:'setup'},
+  k0:{phase:0, tag:'[0] Potwierdzenie kontaktu', speech:sp(()=>CFG.intro.k0), next:'k1'},
+  k1:{phase:0, tag:'[1] Potwierdzenie imienia', custom:'k1'},
+  k2:{phase:0, tag:'[2] Pytanie o intencję', speech:sp(()=>CFG.intro.k2),
+      choices:[
+        {label:'Chce założyć JDG', to:'p1', set:s=>s.path='A'},
+        {label:'Chce założyć spółkę', to:'p1', set:s=>s.path='B'},
+        {label:'Chce przenieść JDG', to:'p1', set:s=>s.path='C'},
+        {label:'Chce przenieść spółkę', to:'p1', set:s=>s.path='D'},
+        {label:'Chce się rozeznać', to:'k2a'},
+      ]},
+  k2a:{phase:0, tag:'[2a] Rozeznanie', speech:sp(()=>CFG.intro.k2a),
+      choices:[{label:'Tak, ma firmę', to:'k2bT'},{label:'Nie, dopiero planuje', to:'k2bN'}]},
+  k2bT:{phase:0, tag:'[2b] Rodzaj działalności', speech:sp(()=>CFG.intro.k2bT),
+      choices:[
+        {label:'JDG', dynSub:()=>'→ '+CFG.paths.C.label, to:'p1', set:s=>s.path='C'},
+        {label:'Spółka', dynSub:()=>'→ '+CFG.paths.D.label, to:'p1', set:s=>s.path='D'},
+      ]},
+  k2bN:{phase:0, tag:'[2b] Planowana działalność', speech:sp(()=>CFG.intro.k2bN),
+      choices:[
+        {label:'JDG', dynSub:()=>'→ '+CFG.paths.A.label, to:'p1', set:s=>s.path='A'},
+        {label:'Spółka', dynSub:()=>'→ '+CFG.paths.B.label, to:'p1', set:s=>s.path='B'},
+      ]},
+
+  p1:{phase:1, dynTag:()=>`[${S.path}1] Zgoda na pytania`,
+      speech:sp(()=>CFG.paths[S.path].agree),
+      onNext:s=>{ s.qIdx=0; }, next:'pq'},
+  pq:{phase:1, custom:'pq'},
+  pqf:{phase:1, custom:'pqf'},
+  pEmp:{phase:1, custom:'emp'},
+
+  w1:{phase:2, tag:'[W1] Na czym mu zależy', custom:'w1'},
+  w2:{phase:2, tag:'[W2] Na czym jeszcze mu zależy', custom:'w2'},
+  w3:{phase:2, tag:'[W3] Podsumowanie', custom:'w3'},
+
+  w4:{phase:3, tag:'[W4] Prezentacja rozwiązań', custom:'w4'},
+  w5:{phase:3, tag:'[W5] Reakcja klienta', speech:sp(()=>CFG.wspolne.w5),
+      fields:[{key:'reakcjaTxt', label:'Odpowiedź klienta', ta:true}],
+      choices:[
+        {label:'Klient pyta o cenę', to:'w6c', set:s=>s.reakcja='pyta o cenę'},
+        {label:'Klient mówi, że wszystko jasne', to:'w6j', set:s=>s.reakcja='wszystko jasne'},
+      ]},
+  w6c:{phase:3, tag:'[W6 — CENA]', speech:sp(()=>CFG.wspolne.w6cena), next:'price'},
+  w6j:{phase:3, tag:'[W6 — JASNE]', speech:sp(()=>CFG.wspolne.w6jasne), next:'price'},
+
+  price:{phase:4, tag:'Bloki cenowe', custom:'price'},
+
+  close:{phase:5, tag:'Pytanie zamykające', speech:sp(()=>CFG.closing.close),
+      fields:[{key:'closeTxt', label:'Odpowiedź klienta', ta:false}],
+      choices:[
+        {label:'TAK — działamy 🎉', to:'zYes', set:s=>s.wynik='TAK'},
+        {label:'NIE / obiekcje', to:'zNo', set:s=>s.wynik='NIE'},
+      ]},
+  zNo:{phase:5, tag:'Obiekcje', custom:'zNo'},
+  zNoA:{phase:5, tag:'Obiekcja', custom:'zNoA'},
+  zYes:{phase:5, tag:'Gratulacje', speech:sp(()=>CFG.closing.gratulacje), next:'sms'},
+  sms:{phase:5, tag:'Wysłanie linku', speech:sp(()=>CFG.closing.sms),
+      choices:[
+        {label:'TAK — dotarł', to:'form'},
+        {label:'NIE — nie dotarł', to:'smsFix'},
+      ]},
+  smsFix:{phase:5, tag:'SMS nie dotarł', hint:sp(()=>CFG.closing.smsFixHint),
+      nextLabel:'SMS dotarł — kontynuuj', next:'form'},
+  form:{phase:5, tag:'Prowadzenie przez formularz', speech:sp(()=>CFG.closing.form), next:'z1'},
+  z1:{phase:5, tag:'[Z1] Umowa + opłata aktywacyjna', speech:sp(()=>CFG.closing.z1), next:'z1a'},
+  z1a:{phase:5, tag:'[Z1a] Propozycja terminu', speech:sp(()=>CFG.closing.z1a),
+      fields:[{key:'terminProp', label:'Proponowany termin (z kalendarza)', dt:true}],
+      choices:[
+        {label:'PASUJE', to:'z1ok', set:s=>{s.termin = fmtTermin(s.answers.terminProp);}},
+        {label:'NIE PASUJE', to:'z1b'},
+      ]},
+  z1b:{phase:5, tag:'[Z1a — KOLEJNY]', speech:sp(()=>CFG.closing.z1b), hint:sp(()=>CFG.closing.z1bHint),
+      fields:[{key:'terminFinal', label:'Umówiony termin onboardingu (z kalendarza)', dt:true}],
+      nextLabel:'Termin umówiony — dalej', next:'zMies',
+      onNext:s=>{ s.termin = fmtTermin(s.answers.terminFinal) || s.termin; }},
+  zMies:{phase:5, tag:'[Z1b] Pierwszy miesiąc rozliczeniowy', speech:sp(()=>CFG.closing.miesiacQ),
+      fields:[{key:'pierwszyMiesiac', label:'Pierwszy miesiąc księgowania (np. lipiec)', ta:false}],
+      choices:[
+        {label:'Bieżący miesiąc — start po 6. dniu', sub:'uprzedź o terminowości księgowania', to:'zMies6', set:s=>s.info6=true},
+        {label:'Bieżący miesiąc — dokumenty zdążą do 6.', to:'z2'},
+        {label:'Od następnego miesiąca', to:'z2'},
+      ]},
+  zMies6:{phase:5, tag:'[Z1b] Uprzedzenie o terminie 6. dnia', speech:sp(()=>CFG.closing.szostyDzien), next:'z2'},
+  z1ok:{phase:5, tag:'[Z1a] Termin potwierdzony', custom:'z1ok'},
+  z2:{phase:5, tag:'[Z2] Zapowiedź onboardingu', speech:sp(()=>CFG.closing.z2), next:'z3'},
+  z3:{phase:5, tag:'[Z3] Pełnomocnictwa', speech:sp(()=>CFG.closing.z3),
+      choices:[
+        {label:'Sam przed spotkaniem', sub:'dział obsługi wyśle instrukcję', dynTo:()=>afterZ3(), set:s=>s.pelnomocnictwa='sam przed spotkaniem (wysłać instrukcję)'},
+        {label:'Wspólnie na spotkaniu', sub:'temat domknięty na onboardingu', dynTo:()=>afterZ3(), set:s=>s.pelnomocnictwa='wspólnie na onboardingu'},
+      ]},
+  z4:{phase:5, tag:'[Z4] Konto organizacji w US · tylko spółka', speech:sp(()=>CFG.closing.z4),
+      choices:[
+        {label:'TAK — ma konto', dynTo:()=>afterZ4(), set:s=>s.kontoUS='ma'},
+        {label:'NIE — nie ma', to:'z4n', set:s=>s.kontoUS='brak — wysłać instrukcję, założyć przed spotkaniem'},
+      ]},
+  z4n:{phase:5, tag:'[Z4 — NIE]', speech:sp(()=>CFG.closing.z4n), dynNext:()=>afterZ4()},
+  z5:{phase:5, tag:'[Z5] Dokumenty od poprzedniego biura · tylko przeniesienie', speech:sp(()=>CFG.closing.z5),
+      choices:[
+        {label:'Klient robi sam', sub:'wysyłamy listę dokumentów', to:'z6', set:s=>s.dokPoprzednie='klient sam (wysłać listę dokumentów)'},
+        {label:'Zleca nam', sub:'+100 zł netto', to:'z5z', set:s=>s.dokPoprzednie='zleca nam (+100 zł netto)'},
+      ]},
+  z5z:{phase:5, tag:'[Z5 — ZLECA]', speech:sp(()=>CFG.closing.z5z),
+      choices:[
+        {label:'TAK — podaje od razu', to:'z5d'},
+        {label:'NIE — prześle później', to:'z5u'},
+      ]},
+  z5d:{phase:5, tag:'[Z5 — DANE]', title:'Dane poprzedniego biura',
+      fields:[
+        {key:'popTel', label:'Numer telefonu do poprzedniego biura', ta:false, direct:'popTel'},
+        {key:'popMail', label:'Mail do poprzedniego biura', ta:false, direct:'popMail'},
+      ],
+      next:'z6'},
+  z5u:{phase:5, tag:'[Z5 — UMÓW]', speech:sp(()=>CFG.closing.z5u), hint:sp(()=>CFG.closing.z5uHint),
+      fields:[{key:'popTermin', label:'Umówiona data i godzina przesłania danych', ta:false, direct:'popTermin'}],
+      next:'z6'},
+  z6:{phase:5, tag:'[Z6] Domknięcie organizacyjne', speech:sp(()=>CFG.closing.z6),
+      fields:[{key:'z6', label:'Odpowiedź klienta / uwagi końcowe', ta:true, direct:'z6'}],
+      nextLabel:'Zakończ rozmowę', next:'end'},
+  end:{phase:5, tag:'Zakończenie', custom:'end'},
+  settings:{phase:0, custom:'settings'},
+};
+
+/* ================= RENDER ================= */
+
+function txt(v){ return typeof v==='function' ? v() : v; }
+
+function render(){
+  const isSettings = S.step==='settings';
+  $('#main').classList.toggle('no-notes', isSettings);
+  $('#notesCol').style.display = isSettings ? 'none' : '';
+  $('#fabs').classList.toggle('hidden', isSettings);
+  $('#copyHeadBtn').style.display = isSettings ? 'none' : '';
+  renderPhases();
+  const st = STEPS[S.step];
+  const el = $('#stage');
+  if(!st){ el.innerHTML = '<div class="card">Błąd kroku.</div>'; return; }
+  if(st.custom){ CUSTOM[st.custom](el, st); }
+  else{ renderGeneric(el, st); }
+  if(!isSettings) renderNote();
+}
+
+function renderPhases(){
+  if(S.step==='settings'){ $('#phases').innerHTML=''; return; }
+  const cur = STEPS[S.step] ? STEPS[S.step].phase : 0;
+  $('#phases').innerHTML = PHASES.map((p,i)=>
+    `<span class="phase ${i<cur?'done':''} ${i===cur?'active':''}">${i<cur?'✓ ':''}${p}</span>`).join('');
+}
+
+function fieldHTML(f){
+  const direct = f.direct;
+  const val = direct ? (S[direct]||'') : (S.answers[f.key]||'');
+  let inp;
+  if(f.dt){
+    inp = `<input type="datetime-local" data-key="${f.key}" ${direct?`data-direct="${direct}"`:''} value="${esc(val)}">
+      <div class="dt-preview" data-dtprev="${f.key}">${esc(fmtTermin(val))}</div>`;
+  } else if(f.ta){
+    inp = `<textarea data-key="${f.key}" ${direct?`data-direct="${direct}"`:''} placeholder="wpisz odpowiedź klienta…">${esc(val)}</textarea>`;
+  } else {
+    inp = `<input type="text" data-key="${f.key}" ${direct?`data-direct="${direct}"`:''} value="${esc(val)}" placeholder="wpisz…">`;
+  }
+  return `<div class="field"><label>${esc(f.label)}</label>${inp}</div>`;
+}
+function bindFields(el){
+  el.querySelectorAll('[data-key]').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      if(inp.dataset.direct){ S[inp.dataset.direct] = inp.value; }
+      S.answers[inp.dataset.key] = inp.value;
+      if(inp.type==='datetime-local'){
+        S.termin = fmtTermin(inp.value);
+        const pv = el.querySelector(`[data-dtprev="${inp.dataset.key}"]`);
+        if(pv) pv.textContent = S.termin;
+      }
+      save(); renderNote();
+    });
+  });
+}
+function navHTML(st, showBack=true){
+  const nx = st.dynNext ? st.dynNext() : st.next;
+  return `<div class="navrow">
+    ${showBack && S.history.length ? '<button class="btn btn-ghost" id="backBtn" type="button">‹ Wstecz</button>':''}
+    ${nx ? `<button class="btn btn-primary" id="nextBtn" type="button">${esc(st.nextLabel||'Dalej')}</button>`:''}
+  </div>`;
+}
+function bindNav(el, st){
+  const b = el.querySelector('#backBtn'); if(b) b.onclick = back;
+  const n = el.querySelector('#nextBtn');
+  if(n) n.onclick = ()=>{ if(st.onNext) st.onNext(S); go(st.dynNext ? st.dynNext() : st.next); };
+  el.querySelectorAll('[data-choice]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const c = (st.choices)[+btn.dataset.choice];
+      if(c.set) c.set(S);
+      go(c.dynTo ? c.dynTo() : c.to);
+    };
+  });
+}
+function renderGeneric(el, st){
+  const tag = st.dynTag ? st.dynTag() : st.tag;
+  let h = `<div class="card"><span class="tag">${esc(tag)}</span>`;
+  if(st.title) h += `<h2 class="step-title">${esc(st.title)}</h2>`;
+  if(st.speech) h += `<p class="speech">${fill(txt(st.speech))}</p>`;
+  if(st.hint) h += `<div class="hint">💡 ${esc(txt(st.hint))}</div>`;
+  if(st.fields) h += `<div class="fields">${st.fields.map(fieldHTML).join('')}</div>`;
+  if(st.choices){
+    h += `<div class="choices">${st.choices.map((c,i)=>{
+      const sub = c.dynSub ? c.dynSub() : c.sub;
+      return `<button class="choice" type="button" data-choice="${i}"><span>${esc(c.label)}${sub?`<small>${esc(sub)}</small>`:''}</span><span class="arr">›</span></button>`;
+    }).join('')}</div>`;
+  }
+  h += navHTML(st) + `</div>`;
+  el.innerHTML = h;
+  bindFields(el); bindNav(el, st);
+}
+
+/* ---------- CUSTOM STEPS ---------- */
+
+const CUSTOM = {
+
+setup(el){
+  el.innerHTML = `<div class="card">
+    <span class="tag">Setup</span>
+    <h2 class="step-title">Przygotowanie do rozmowy</h2>
+    <div class="fields">
+      <div class="field"><label>Czy masz imię klienta ze zgłoszenia?</label>
+        <div class="seg" role="group">
+          <button type="button" id="suYes" class="${S.hasName===true?'on':''}">TAK, mam</button>
+          <button type="button" id="suNo" class="${S.hasName===false?'on':''}">NIE, zapytam</button>
+        </div></div>
+      <div class="field" id="suKWrap" style="display:${S.hasName?'block':'none'}">
+        <label>Imię klienta ze zgłoszenia</label>
+        <input type="text" id="suK" value="${esc(S.clientName)}" placeholder="np. Marek"></div>
+      <div id="suGWrap" style="display:${S.hasName?'block':'none'}">${genderBlockHTML()}</div>
+    </div>
+    <div class="navrow"><button class="btn btn-primary" id="startBtn" type="button">Rozpocznij rozmowę ›</button></div>
+  </div>`;
+  const updG = bindGenderUI();
+  $('#suK').oninput = e=>{
+    S.clientName = e.target.value;
+    if(!S.genderManual) S.gender = detectGender(S.clientName);
+    updG(); save(); renderNote();
+  };
+  $('#suYes').onclick = ()=>{ S.hasName = true; save(); render(); };
+  $('#suNo').onclick = ()=>{ S.hasName = false; S.clientName=''; S.gender='m'; S.genderManual=false; save(); render(); };
+  $('#startBtn').onclick = ()=>{
+    if(S.hasName===null) S.hasName = !!S.clientName;
+    go('k0');
+  };
+},
+
+k1(el){
+  const speech = S.hasName ? CFG.intro.k1a : CFG.intro.k1b;
+  el.innerHTML = `<div class="card">
+    <span class="tag">[1] Potwierdzenie imienia · wersja ${S.hasName?'A':'B'}</span>
+    <p class="speech" id="k1Speech">${fill(speech)}</p>
+    <div class="fields"><div class="field">
+      <label>Imię klienta${S.hasName?' (popraw, jeśli inne)':''}</label>
+      <input type="text" id="kName" value="${esc(S.clientName)}" placeholder="np. Marek">
+    </div>${genderBlockHTML()}</div>
+    <div class="navrow">
+      ${S.history.length?'<button class="btn btn-ghost" id="backBtn" type="button">‹ Wstecz</button>':''}
+      <button class="btn btn-primary" id="k1Next" type="button">Dalej</button>
+    </div></div>`;
+  const updG = bindGenderUI(()=>{ $('#k1Speech').innerHTML = fill(S.hasName ? CFG.intro.k1a : CFG.intro.k1b); });
+  $('#kName').oninput = e=>{
+    S.clientName = e.target.value;
+    if(!S.genderManual) S.gender = detectGender(S.clientName);
+    updG(); save(); renderNote();
+    $('#k1Speech').innerHTML = fill(S.hasName ? CFG.intro.k1a : CFG.intro.k1b);
+  };
+  const b = el.querySelector('#backBtn'); if(b) b.onclick = back;
+  $('#k1Next').onclick = ()=> go('k2');
+},
+
+/* --- generyczne pytanie wywiadu z konfiguracji --- */
+pq(el){
+  const qs = CFG.paths[S.path].questions;
+  if(!qs.length || S.qIdx >= qs.length){ go('pEmp'); return; }
+  const q = qs[S.qIdx];
+  const tag = `[${S.path}${S.qIdx+2}] ${q.note} · ${CFG.paths[S.path].label}`;
+  let h = `<div class="card"><span class="tag">${esc(tag)}</span>
+    <p class="speech">${fill(q.speech)}</p>`;
+  if(q.type==='choice'){
+    h += `<div class="choices">${(q.options||[]).map((o,i)=>
+      `<button class="choice" type="button" data-opt="${i}"><span>${esc(o.label)}</span><span class="arr">›</span></button>`).join('')}</div>`;
+  } else {
+    if(q.after) h += `<p class="speech">${fill(q.after)}</p>`;
+    if(q.hint) h += `<div class="hint">💡 ${esc(q.hint)}</div>`;
+    const ta = q.type==='long';
+    const val = S.answers[q.id]||'';
+    if(q.type==='city'){
+      h += `<div class="fields">
+        <div class="field"><label>${esc(q.note)}</label>
+          <input type="text" data-q="${q.id}" value="${esc(val)}" placeholder="np. Kalisz"></div>
+        <div class="field"><label>Województwo (programy dotacji są per województwo)</label>
+          <select id="wojSel" class="woj-select">
+            <option value="">— wybierz województwo —</option>
+            ${WOJEWODZTWA.map(w=>`<option value="${w}" ${S.answers.wojewodztwo===w?'selected':''}>${w}</option>`).join('')}
+          </select></div>
+      </div>`;
+    } else {
+      h += `<div class="fields"><div class="field"><label>${esc(q.note)}</label>${
+        ta ? `<textarea data-q="${q.id}" placeholder="wpisz odpowiedź klienta…">${esc(val)}</textarea>`
+           : `<input type="text" data-q="${q.id}" value="${esc(val)}" placeholder="wpisz…">`
+      }</div></div>`;
+    }
+  }
+  h += `<div class="navrow">
+    <button class="btn btn-ghost" id="backBtn" type="button">‹ Wstecz</button>
+    ${q.type!=='choice'?'<button class="btn btn-primary" id="nextBtn" type="button">Dalej</button>':''}
+  </div><div class="dots">${qs.map((_,i)=>`<span class="${i<=S.qIdx?'on':''}"></span>`).join('')}</div></div>`;
+  el.innerHTML = h;
+  el.querySelectorAll('[data-q]').forEach(inp=>{
+    inp.addEventListener('input', ()=>{ S.answers[q.id]=inp.value; save(); renderNote(); });
+  });
+  const woj = el.querySelector('#wojSel');
+  if(woj) woj.onchange = ()=>{ S.answers.wojewodztwo = woj.value; save(); renderNote(); };
+  el.querySelector('#backBtn').onclick = ()=>{
+    if(S.qIdx>0){ S.qIdx--; save(); render(); } else back();
+  };
+  const n = el.querySelector('#nextBtn');
+  if(n) n.onclick = ()=>{ S.qIdx++; save(); render(); window.scrollTo({top:0,behavior:'smooth'}); };
+  el.querySelectorAll('[data-opt]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const o = q.options[+btn.dataset.opt];
+      S.answers[q.id] = o.noteValue || o.label;
+      if(o.followup){ S.pqFollow = {text:o.followup, hint:q.hint||'', tag:`[${S.path}${S.qIdx+2}] ${q.note}`}; go('pqf'); }
+      else { S.qIdx++; save(); render(); }
+    };
+  });
+},
+
+pqf(el){
+  const f = S.pqFollow || {text:'', hint:'', tag:''};
+  el.innerHTML = `<div class="card">
+    <span class="tag">${esc(f.tag)} — odpowiedź</span>
+    <p class="speech">${fill(f.text)}</p>
+    ${f.hint?`<div class="hint">💡 ${esc(f.hint)}</div>`:''}
+    <div class="navrow">
+      <button class="btn btn-ghost" id="backBtn" type="button">‹ Wstecz</button>
+      <button class="btn btn-primary" id="nextBtn" type="button">Dalej</button>
+    </div></div>`;
+  el.querySelector('#backBtn').onclick = back;
+  el.querySelector('#nextBtn').onclick = ()=>{ S.qIdx++; S.pqFollow=null; save(); S.step='pq'; render(); window.scrollTo({top:0,behavior:'smooth'}); };
+},
+
+emp(el){
+  const p = CFG.paths[S.path];
+  const isNew = S.path==='A'||S.path==='B';
+  el.innerHTML = `<div class="card">
+    <span class="tag">[${S.path}·pracownicy] Pracownicy</span>
+    <p class="speech">${fill(p.emp.speech)}</p>
+    <div class="hint">💡 Ta odpowiedź decyduje o bloku cenowym (z obsługą kadrową lub bez).</div>
+    <div class="fields">
+      <div class="field"><label>${isNew?'Czy planuje zatrudniać?':'Czy zatrudnia?'}</label>
+        <div class="seg">
+          <button type="button" id="empY" class="${S.emp===true?'on':''}">TAK</button>
+          <button type="button" id="empN" class="${S.emp===false?'on':''}">NIE</button>
+        </div></div>
+      <div class="field" id="empCWrap" style="display:${S.emp?'block':'none'}">
+        <label>Ilu pracowników / jakie umowy?</label>
+        <input type="text" id="empC" value="${esc(S.empCount)}" placeholder="np. 2 osoby, umowa zlecenie"></div>
+    </div>
+    <div class="navrow">
+      <button class="btn btn-ghost" id="backBtn" type="button">‹ Wstecz</button>
+      <button class="btn btn-primary" id="nextBtn" type="button">Dalej — priorytety klienta</button>
+    </div></div>`;
+  $('#empY').onclick = ()=>{ S.emp = true; save(); render(); };
+  $('#empN').onclick = ()=>{ S.emp = false; S.empCount=''; save(); render(); };
+  $('#empC').oninput = e=>{ S.empCount = e.target.value; save(); renderNote(); };
+  el.querySelector('#backBtn').onclick = ()=>{
+    const qs = CFG.paths[S.path].questions;
+    if(qs.length){ S.qIdx = qs.length-1; S.step='pq'; save(); render(); } else back();
+  };
+  el.querySelector('#nextBtn').onclick = ()=> go('w1');
+},
+
+w1(el){ renderAreasPick(el, 'w1'); },
+w2(el){ renderAreasPick(el, 'w2'); },
+
+w3(el){
+  const names = S.priorities.map(id => CFG.areas.find(a=>a.id===id)?.label).filter(Boolean);
+  const listTxt = names.length ? names.join(', ') : '[zaznaczone obszary]';
+  const speech = CFG.wspolne.w3.replace('[obszary]', listTxt);
+  el.innerHTML = `<div class="card">
+    <span class="tag">[W3] Podsumowanie przez handlowca</span>
+    <p class="speech">${fill(speech)}</p>
+    <div class="hint">💡 ${esc(CFG.wspolne.w3hint)}</div>
+    <div class="navrow">
+      <button class="btn btn-ghost" id="backBtn" type="button">‹ Wstecz</button>
+      <button class="btn btn-primary" id="nextBtn" type="button">Klient potwierdził — prezentuję ›</button>
+    </div></div>`;
+  el.querySelector('#backBtn').onclick = back;
+  el.querySelector('#nextBtn').onclick = ()=>{ S.areaIdx = 0; go(S.priorities.length ? 'w4' : 'w5'); };
+},
+
+w4(el){
+  const ids = S.priorities.filter(id => CFG.areas.some(a=>a.id===id));
+  if(!ids.length || S.areaIdx >= ids.length){ go('w5'); return; }
+  const area = CFG.areas.find(a=>a.id===ids[S.areaIdx]);
+  const last = S.areaIdx === ids.length-1;
+  const intro = CFG.wspolne.w4intro.replace('[obszar]', area.label.toLowerCase());
+  el.innerHTML = `<div class="card">
+    <span class="tag">[W4] Prezentacja · ${S.areaIdx+1} z ${ids.length} · ${esc(area.label)}</span>
+    <p class="speech">${fill(intro)}</p>
+    <p class="speech">${fill(area.answer)}</p>
+    <p class="speech"><b>${fill(CFG.wspolne.closingQ)}</b></p>
+    <div class="dots">${ids.map((_,i)=>`<span class="${i<=S.areaIdx?'on':''}"></span>`).join('')}</div>
+    <div class="navrow">
+      <button class="btn btn-ghost" id="backBtn" type="button">‹ Wstecz</button>
+      <button class="btn btn-primary" id="nextBtn" type="button">${last?'Wszystkie obszary omówione ›':'Następny obszar ›'}</button>
+    </div></div>`;
+  el.querySelector('#backBtn').onclick = ()=>{
+    if(S.areaIdx>0){ S.areaIdx--; save(); render(); } else back();
+  };
+  el.querySelector('#nextBtn').onclick = ()=>{
+    if(last){ go('w5'); } else { S.areaIdx++; save(); render(); window.scrollTo({top:0,behavior:'smooth'}); }
+  };
+},
+
+price(el){
+  const bid = priceBlockId();
+  const blk = CFG.prices[bid];
+  const isSpolka = S.path==='B'||S.path==='D';
+  const emp = S.priceOverride !== null ? S.priceOverride : !!S.emp;
+  el.innerHTML = `<div class="card">
+    <span class="tag">Wycena · ${esc(CFG.paths[S.path].label)}</span>
+    <div class="price-hero">
+      <span class="bname">${esc(blk.name)}</span>
+      <span class="amount">${esc(blk.amount)}</span><span class="per">${esc(blk.per)}</span>
+    </div>
+    <div class="field" style="margin-top:14px"><label>Pracownicy (przełącz, jeśli w rozmowie coś się zmieniło)</label>
+      <div class="seg">
+        <button type="button" id="prN" class="${!emp?'on':''}">Bez pracowników</button>
+        <button type="button" id="prY" class="${emp?'on':''}">Z pracownikami</button>
+      </div></div>
+    <p class="speech">${fill(blk.speech)}</p>
+    ${isSpolka?`<details class="crbr"><summary>Jeśli klient zapyta o CRBR ›</summary><div class="body">${esc(CFG.prices.crbr)}</div></details>`:''}
+    <div class="navrow">
+      <button class="btn btn-ghost" id="backBtn" type="button">‹ Wstecz</button>
+      <button class="btn btn-primary" id="nextBtn" type="button">Przechodzę do zamknięcia ›</button>
+    </div></div>`;
+  $('#prY').onclick = ()=>{ S.priceOverride = true; save(); render(); };
+  $('#prN').onclick = ()=>{ S.priceOverride = false; save(); render(); };
+  el.querySelector('#backBtn').onclick = back;
+  el.querySelector('#nextBtn').onclick = ()=> go('close');
+},
+
+z1ok(el){
+  const raw = S.answers.terminProp || '';
+  el.innerHTML = `<div class="card">
+    <span class="tag">[Z1a] Termin potwierdzony</span>
+    <h2 class="step-title">Termin onboardingu umówiony</h2>
+    <div class="fields"><div class="field"><label>Umówiony termin onboardingu (z kalendarza)</label>
+      <input type="datetime-local" id="tf" value="${esc(raw)}">
+      <div class="dt-preview" id="tfPrev">${esc(S.termin || fmtTermin(raw))}</div></div></div>
+    <div class="navrow">
+      <button class="btn btn-ghost" id="backBtn" type="button">‹ Wstecz</button>
+      <button class="btn btn-primary" id="nextBtn" type="button">Dalej</button>
+    </div></div>`;
+  $('#tf').oninput = e=>{
+    S.answers.terminProp = e.target.value;
+    S.termin = fmtTermin(e.target.value);
+    $('#tfPrev').textContent = S.termin;
+    save(); renderNote();
+  };
+  el.querySelector('#backBtn').onclick = back;
+  el.querySelector('#nextBtn').onclick = ()=> go('zMies');
+},
+
+zNo(el){
+  el.innerHTML = `<div class="card">
+    <span class="tag">Obiekcje</span>
+    <div class="result-pill no">Klient odmówił / ma obiekcje</div>
+    <p class="speech">Którą obiekcję zgłasza klient? Wybierz kafelek — dostaniesz gotową odpowiedź.</p>
+    <div class="choices">${CFG.objections.map((o,i)=>{
+      const used = S.objectionsRaised.includes(o.id);
+      return `<button class="choice" type="button" data-obj="${o.id}"><span>${used?'✓ ':''}${esc(o.label)}${used?'<small>już omówiona — możesz wrócić do odpowiedzi</small>':''}</span><span class="arr">›</span></button>`;
+    }).join('')}</div>
+    <div class="fields"><div class="field"><label>Inna obiekcja / notatka własna</label>
+      <textarea data-key="obiekcja" placeholder="np. obiekcja spoza listy — zanotuj, trafi do notatki…">${esc(S.answers.obiekcja||'')}</textarea></div></div>
+    <div class="navrow">
+      <button class="btn btn-ghost" id="backBtn" type="button">‹ Wstecz</button>
+      <button class="btn btn-primary" id="nextBtn" type="button">Nadal odmawia — zakończ rozmowę</button>
+    </div></div>`;
+  bindFields(el);
+  el.querySelectorAll('[data-obj]').forEach(btn=>{
+    btn.onclick = ()=>{
+      S.currentObjection = btn.dataset.obj;
+      if(!S.objectionsRaised.includes(btn.dataset.obj)) S.objectionsRaised.push(btn.dataset.obj);
+      go('zNoA');
+    };
+  });
+  el.querySelector('#backBtn').onclick = back;
+  el.querySelector('#nextBtn').onclick = ()=>{ S.wynik='NIE'; go('end'); };
+},
+
+zNoA(el){
+  const o = CFG.objections.find(x=>x.id===S.currentObjection);
+  if(!o){ go('zNo'); return; }
+  el.innerHTML = `<div class="card">
+    <span class="tag">Obiekcja · ${esc(o.label)}</span>
+    <p class="speech">${fill(o.answer)}</p>
+    <div class="choices">
+      <button class="choice" type="button" id="objWin"><span>Klient przekonany — wracam do zamknięcia 🎉</span><span class="arr">›</span></button>
+      <button class="choice" type="button" id="objMore"><span>Ma kolejną obiekcję</span><span class="arr">›</span></button>
+      <button class="choice" type="button" id="objLost"><span>Nadal odmawia — zakończ rozmowę</span><span class="arr">›</span></button>
+    </div>
+    <div class="navrow"><button class="btn btn-ghost" id="backBtn" type="button">‹ Wstecz</button></div>
+  </div>`;
+  el.querySelector('#objWin').onclick = ()=> go('close');
+  el.querySelector('#objMore').onclick = ()=> go('zNo');
+  el.querySelector('#objLost').onclick = ()=>{ S.wynik='NIE'; go('end'); };
+  el.querySelector('#backBtn').onclick = back;
+},
+
+end(el){
+  const yes = S.wynik==='TAK';
+  el.innerHTML = `<div class="card">
+    <span class="tag">Zakończenie rozmowy</span>
+    ${S.wynik ? `<div class="result-pill ${yes?'yes':'no'}">${yes?'✓ Klient zamknięty — działamy':'Bez zamknięcia — obiekcje w notatce'}</div>`:''}
+    <p class="speech">${fill(CFG.closing.end)}</p>
+    <div class="hint">💡 Notatka z całej rozmowy jest gotowa w panelu obok — skopiuj ją do CRM. ${
+      (S.path && CFG.paths[S.path].optyTodo) ? '<b>Pamiętaj: przekaż dane do działu optymalizacji.</b>' : ''}</div>
+    <div class="navrow">
+      <button class="btn btn-ghost" id="backBtn" type="button">‹ Wstecz</button>
+      <button class="btn btn-primary" id="copyEnd" type="button">Kopiuj notatkę</button>
+      ${S.wynik==='TAK' ? '<button class="btn btn-ghost" id="smsEnd" type="button">Kopiuj SMS dla klienta</button>' : ''}
+      <button class="btn btn-ghost" id="newCall" type="button">Nowa rozmowa ›</button>
+    </div></div>`;
+  el.querySelector('#backBtn').onclick = back;
+  el.querySelector('#copyEnd').onclick = e=> copyNote(e.target);
+  const se = el.querySelector('#smsEnd'); if(se) se.onclick = e=> copySms(e.target);
+  el.querySelector('#newCall').onclick = askReset;
+},
+
+/* ================= USTAWIENIA ================= */
+
+settings(el){
+  const P = ['A','B','C','D'];
+  el.innerHTML = `
+  <div class="set-head">
+    <h2>Ustawienia skryptu</h2>
+    <button class="btn btn-primary" id="setBack" type="button">‹ Wróć do skryptu</button>
+  </div>
+  <p class="set-info">Wszystkie teksty zapisują się automatycznie w tej przeglądarce.
+  Znacznik <code>{K}</code> (imię klienta) podstawia się sam z odmianą; <code>{H}</code> wyświetla się jako [Twoje imię] — handlowiec mówi je sam.
+  Struktura rozgałęzień (ścieżki A–D, wycena, zamknięcie) jest stała — edytujesz treści, pytania wywiadu i obszary prezentacji.
+  Żeby przenieść konfigurację na inny komputer, użyj sekcji „Kopia zapasowa".</p>
+
+  <details class="sect" open><summary>Blok startowy <small>· powitanie i rozpoznanie intencji</small><span class="chev">›</span></summary>
+    <div class="sect-body">
+      ${setRow('intro.k0','[0] Potwierdzenie kontaktu')}
+      ${setRow('intro.k1a','[1] Wersja A — mam imię ze zgłoszenia')}
+      ${setRow('intro.k1b','[1] Wersja B — nie mam imienia')}
+      ${setRow('intro.k2','[2] Pytanie o intencję')}
+      ${setRow('intro.k2a','[2a] Czy ma już firmę? (rozeznanie)')}
+      ${setRow('intro.k2bT','[2b] Jaką działalność prowadzi?')}
+      ${setRow('intro.k2bN','[2b] Jaką działalność planuje?')}
+    </div>
+  </details>
+
+  ${P.map(p=>`
+  <details class="sect" data-sect="path${p}"><summary>Ścieżka ${p} <small>· ${esc(CFG.paths[p].label)} · ${CFG.paths[p].questions.length} pytań</small><span class="chev">›</span></summary>
+    <div class="sect-body">
+      ${setRowInput(`paths.${p}.label`,'Nazwa ścieżki (widoczna w notatce)')}
+      ${setRow(`paths.${p}.agree`,`[${p}1] Zgoda na pytania`)}
+      <div class="srow"><label>Pytania wywiadu (kolejność = kolejność w rozmowie)</label>
+        <div id="qlist${p}">${CFG.paths[p].questions.map((q,i)=>qItemHTML(p,q,i)).join('')}</div>
+        <button class="addbtn" type="button" data-addq="${p}">＋ Dodaj pytanie</button>
+      </div>
+      ${setRow(`paths.${p}.emp.speech`,'Pytanie o pracowników (decyduje o bloku cenowym — zawsze ostatnie)')}
+      <div class="srow"><label><input type="checkbox" data-cfgchk="paths.${p}.optyTodo" ${CFG.paths[p].optyTodo?'checked':''}>
+        Po rozmowie przypominaj: „przekaż dane do działu optymalizacji"</label></div>
+    </div>
+  </details>`).join('')}
+
+  <details class="sect"><summary>Priorytety i prezentacja <small>· W1–W6 + obszary (mapa obiekcji)</small><span class="chev">›</span></summary>
+    <div class="sect-body">
+      ${setRow('wspolne.w1','[W1] Na czym mu zależy')}
+      ${setRow('wspolne.w2','[W2] Na czym jeszcze mu zależy')}
+      ${setRow('wspolne.w3','[W3] Podsumowanie — [obszary] podstawi się automatycznie')}
+      ${setRow('wspolne.w3hint','[W3] Podpowiedź dla handlowca')}
+      ${setRow('wspolne.w4intro','[W4] Wstęp prezentacji — [obszar] podstawi się automatycznie')}
+      ${setRow('wspolne.closingQ','Pytanie zamykające po każdym obszarze')}
+      ${setRow('wspolne.w5','[W5] Reakcja klienta')}
+      ${setRow('wspolne.w6cena','[W6] Gdy klient pyta o cenę')}
+      ${setRow('wspolne.w6jasne','[W6] Gdy wszystko jasne')}
+      <div class="srow"><label>Obszary prezentacji (mapa obiekcji)</label>
+        <div id="arealist">${CFG.areas.map((a,i)=>areaItemHTML(a,i)).join('')}</div>
+        <button class="addbtn" type="button" id="addArea">＋ Dodaj obszar</button>
+      </div>
+    </div>
+  </details>
+
+  <details class="sect" data-sect="objections"><summary>Obiekcje po odmowie <small>· kafelki + odpowiedzi zbijające · ${CFG.objections.length} obiekcji</small><span class="chev">›</span></summary>
+    <div class="sect-body">
+      <div class="srow"><label>Obiekcje pokazywane jako kafelki po „NIE / obiekcje". Odpowiedź pisz w formie męskiej („czy zdecydował się Pan…") — wersja żeńska tworzy się automatycznie.</label>
+        <div id="objlist">${CFG.objections.map((o,i)=>objItemHTML(o,i)).join('')}</div>
+        <button class="addbtn" type="button" id="addObj">＋ Dodaj obiekcję</button>
+      </div>
+    </div>
+  </details>
+
+  <details class="sect"><summary>Bloki cenowe <small>· 6 bloków + CRBR</small><span class="chev">›</span></summary>
+    <div class="sect-body">
+      ${['b1','b2','b3','b4','b5','b6'].map(b=>`
+        <div class="qitem">
+          <div class="qitem-head"><span class="qlabel">${esc(CFG.prices[b].name)}</span></div>
+          <div class="grid2">
+            ${setRowInput(`prices.${b}.name`,'Nazwa bloku')}
+            ${setRowInput(`prices.${b}.amount`,'Kwota (duży napis)')}
+          </div>
+          ${setRowInput(`prices.${b}.per`,'Dopisek przy kwocie')}
+          ${setRow(`prices.${b}.speech`,'Tekst mówiony')}
+          ${setRowInput(`prices.${b}.note`,'Skrót do notatki')}
+        </div>`).join('')}
+      ${setRow('prices.crbr','Odpowiedź, gdy klient zapyta o CRBR')}
+    </div>
+  </details>
+
+  <details class="sect"><summary>Zamknięcie sprzedaży <small>· od „działamy?" do końca rozmowy</small><span class="chev">›</span></summary>
+    <div class="sect-body">
+      ${setRow('closing.close','Pytanie zamykające „działamy?"')}
+      ${setRow('closing.gratulacje','Po TAK — gratulacje')}
+      ${setRow('closing.sms','Wysłanie linku SMS')}
+      ${setRow('closing.smsFixHint','Podpowiedź, gdy SMS nie dotarł')}
+      ${setRow('closing.form','Prowadzenie przez formularz')}
+      ${setRow('closing.z1','[Z1] Umowa + opłata aktywacyjna')}
+      ${setRow('closing.z1a','[Z1a] Propozycja terminu')}
+      ${setRow('closing.z1b','[Z1a] Kolejny termin')}
+      ${setRow('closing.z1bHint','[Z1a] Podpowiedź dla handlowca')}
+      ${setRow('closing.miesiacQ','[Z1b] Pytanie o pierwszy miesiąc rozliczeniowy')}
+      ${setRow('closing.szostyDzien','[Z1b] Uprzedzenie o terminie 6. dnia (start po 6.)')}
+      ${setRow('closing.z2','[Z2] Zapowiedź onboardingu')}
+      ${setRow('closing.z3','[Z3] Pełnomocnictwa')}
+      ${setRow('closing.z4','[Z4] Konto organizacji w US (spółki)')}
+      ${setRow('closing.z4n','[Z4] Gdy nie ma konta')}
+      ${setRow('closing.z5','[Z5] Dokumenty od poprzedniego biura (przeniesienia)')}
+      ${setRow('closing.z5z','[Z5] Gdy zleca nam')}
+      ${setRow('closing.z5u','[Z5] Gdy prześle dane później')}
+      ${setRow('closing.z5uHint','[Z5] Podpowiedź dla handlowca')}
+      ${setRow('closing.z6','[Z6] Domknięcie organizacyjne')}
+      ${setRow('closing.end','Zakończenie rozmowy')}
+    </div>
+  </details>
+
+  <details class="sect"><summary>SMS podsumowujący <small>· wysyłany klientowi po rozmowie</small><span class="chev">›</span></summary>
+    <div class="sect-body">
+      <div class="srow"><label>Znaczniki: {K} = imię klienta (odmienia się samo), [termin] = termin onboardingu, [miesiąc] = pierwszy miesiąc księgowania, [imię] = wpisuje handlowiec po wklejeniu. Linie warunkowe wchodzą do SMS-a tylko, gdy dotyczą klienta.</label></div>
+      ${setRow('sms.main','Część główna (termin, komputer, ok. 1 h, opłata aktywacyjna)')}
+      ${setRow('sms.pelnomocnictwa','Linia warunkowa: pełnomocnictwa (gdy klient składa sam)')}
+      ${setRow('sms.kontoUS','Linia warunkowa: konto organizacji w US (gdy spółka go nie ma)')}
+      ${setRow('sms.miesiac','Linia: pierwszy miesiąc księgowania')}
+      ${setRow('sms.koniec','Zakończenie i podpis')}
+    </div>
+  </details>
+
+  <details class="sect"><summary>Kopia zapasowa <small>· eksport / import / reset</small><span class="chev">›</span></summary>
+    <div class="sect-body">
+      <div class="tools">
+        <button class="btn btn-primary" id="expBtn" type="button">Kopiuj konfigurację (JSON)</button>
+        <button class="btn btn-ghost" id="impBtn" type="button">Wczytaj z pola poniżej</button>
+        <button class="btn btn-danger" id="rstBtn" type="button">Przywróć domyślne</button>
+      </div>
+      <div class="srow"><label>Wklej tu konfigurację JSON (np. od innego handlowca), potem „Wczytaj z pola poniżej"</label>
+        <textarea id="impArea" style="min-height:110px;font-family:ui-monospace,Menlo,monospace;font-size:12px" placeholder='{"version":2, ...}'></textarea></div>
+    </div>
+  </details>`;
+
+  /* bindings */
+  $('#setBack').onclick = ()=>{ S.step = S.settingsReturn || 'setup'; S.settingsReturn=null; save(); render(); window.scrollTo({top:0}); };
+  el.querySelectorAll('[data-cfg]').forEach(inp=>{
+    inp.addEventListener('input', ()=>{ cfgSet(inp.dataset.cfg, inp.value); });
+  });
+  el.querySelectorAll('[data-cfgchk]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{ cfgSet(inp.dataset.cfgchk, inp.checked); });
+  });
+  /* pytania: edycja pól */
+  el.querySelectorAll('[data-qfield]').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      const [p,i,field] = inp.dataset.qfield.split('|');
+      const q = CFG.paths[p].questions[+i];
+      if(field.startsWith('opt')){
+        const [,oi,of] = field.split(':');
+        q.options[+oi][of] = inp.value;
+      } else q[field] = inp.value;
+      saveConfig();
+    });
+  });
+  el.querySelectorAll('[data-qtype]').forEach(sel=>{
+    sel.addEventListener('change', ()=>{
+      const [p,i] = sel.dataset.qtype.split('|');
+      const q = CFG.paths[p].questions[+i];
+      q.type = sel.value;
+      if(q.type==='choice' && !q.options) q.options = [
+        {label:'TAK', noteValue:'TAK', followup:''},
+        {label:'NIE', noteValue:'NIE', followup:''},
+      ];
+      saveConfig(); render(); reopenSect(el, 'path'+p);
+    });
+  });
+  /* pytania: góra/dół/usuń/dodaj */
+  el.querySelectorAll('[data-qmove]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const [p,i,dir] = btn.dataset.qmove.split('|');
+      const arr = CFG.paths[p].questions; const idx=+i; const j = idx + (dir==='up'?-1:1);
+      if(j<0||j>=arr.length) return;
+      [arr[idx],arr[j]] = [arr[j],arr[idx]];
+      saveConfig(); render(); reopenSect($('#stage'), 'path'+p);
+    };
+  });
+  el.querySelectorAll('[data-qdel]').forEach(btn=>{
+    btn.onclick = ()=> armConfirm(btn, '✓?', ()=>{
+      const [p,i] = btn.dataset.qdel.split('|');
+      CFG.paths[p].questions.splice(+i,1);
+      saveConfig(); render(); reopenSect($('#stage'), 'path'+p);
+    });
+  });
+  el.querySelectorAll('[data-addq]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const p = btn.dataset.addq;
+      const id = 'q' + Date.now().toString(36);
+      CFG.paths[p].questions.push({id, type:'short', note:'Nowe pytanie', speech:'Treść pytania…'});
+      saveConfig(); render(); reopenSect($('#stage'), 'path'+p);
+    };
+  });
+  /* obszary */
+  el.querySelectorAll('[data-afield]').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      const [i,field] = inp.dataset.afield.split('|');
+      CFG.areas[+i][field] = inp.value;
+      saveConfig();
+    });
+  });
+  el.querySelectorAll('[data-amove]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const [i,dir] = btn.dataset.amove.split('|');
+      const idx=+i; const j = idx + (dir==='up'?-1:1);
+      if(j<0||j>=CFG.areas.length) return;
+      [CFG.areas[idx],CFG.areas[j]] = [CFG.areas[j],CFG.areas[idx]];
+      saveConfig(); render();
+    };
+  });
+  el.querySelectorAll('[data-adel]').forEach(btn=>{
+    btn.onclick = ()=> armConfirm(btn, '✓?', ()=>{
+      const i = +btn.dataset.adel;
+      const id = CFG.areas[i].id;
+      CFG.areas.splice(i,1);
+      S.priorities = S.priorities.filter(x=>x!==id);
+      saveConfig(); save(); render();
+    });
+  });
+  $('#addArea').onclick = ()=>{
+    CFG.areas.push({id:'a'+Date.now().toString(36), label:'Nowy obszar', answer:'Odpowiedź handlowca…'});
+    saveConfig(); render();
+  };
+  /* obiekcje */
+  el.querySelectorAll('[data-ofield]').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      const [i,field] = inp.dataset.ofield.split('|');
+      CFG.objections[+i][field] = inp.value;
+      saveConfig();
+    });
+  });
+  el.querySelectorAll('[data-omove]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const [i,dir] = btn.dataset.omove.split('|');
+      const idx=+i; const j = idx + (dir==='up'?-1:1);
+      if(j<0||j>=CFG.objections.length) return;
+      [CFG.objections[idx],CFG.objections[j]] = [CFG.objections[j],CFG.objections[idx]];
+      saveConfig(); render(); reopenSect($('#stage'), 'objections');
+    };
+  });
+  el.querySelectorAll('[data-odel]').forEach(btn=>{
+    btn.onclick = ()=> armConfirm(btn, '✓?', ()=>{
+      const i = +btn.dataset.odel;
+      const id = CFG.objections[i].id;
+      CFG.objections.splice(i,1);
+      S.objectionsRaised = S.objectionsRaised.filter(x=>x!==id);
+      saveConfig(); save(); render(); reopenSect($('#stage'), 'objections');
+    });
+  });
+  $('#addObj').onclick = ()=>{
+    CFG.objections.push({id:'o'+Date.now().toString(36), label:'Nowa obiekcja', answer:'Odpowiedź zbijająca…'});
+    saveConfig(); render(); reopenSect($('#stage'), 'objections');
+  };
+  /* backup */
+  $('#expBtn').onclick = e=>{
+    const btn = e.target;
+    const t = JSON.stringify(CFG, null, 2);
+    const flash = msg=>{ const o=btn.textContent; btn.textContent=msg; setTimeout(()=>btn.textContent='Kopiuj konfigurację (JSON)',1800); };
+    (navigator.clipboard?.writeText(t) || Promise.reject()).then(()=>flash('Skopiowano ✓'))
+      .catch(()=>{ $('#impArea').value = t; flash('Wklejono do pola poniżej ↓'); });
+  };
+  $('#impBtn').onclick = e=>{
+    const btn = e.target;
+    const flash = msg=>{ btn.textContent=msg; setTimeout(()=>btn.textContent='Wczytaj z pola poniżej',2200); };
+    try{
+      const parsed = JSON.parse($('#impArea').value);
+      if(!parsed || typeof parsed!=='object' || !parsed.paths) throw new Error('brak sekcji paths');
+      CFG = Object.assign(deepClone(DEFAULT_CONFIG), parsed);
+      saveConfig(); render();
+    }catch(err){ flash('Błąd: niepoprawny JSON ✗'); }
+  };
+  $('#rstBtn').onclick = ()=> showModal({
+    title:'Przywrócić domyślne teksty?',
+    text:'Wszystkie Twoje zmiany w treściach skryptu zostaną usunięte i wróci wersja domyślna. Tego nie da się cofnąć.',
+    confirmLabel:'Tak, przywróć domyślne',
+    onConfirm: ()=>{ resetConfig(); render(); },
+  });
+},
+};
+
+function reopenSect(el, name){
+  const d = el.querySelector(`[data-sect="${name}"]`);
+  if(d) d.open = true;
+}
+function setRow(path, label){
+  return `<div class="srow"><label>${esc(label)}</label>
+    <textarea data-cfg="${path}">${esc(cfgGet(path)??'')}</textarea></div>`;
+}
+function setRowInput(path, label){
+  return `<div class="srow"><label>${esc(label)}</label>
+    <input type="text" data-cfg="${path}" value="${esc(cfgGet(path)??'')}"></div>`;
+}
+function qItemHTML(p,q,i){
+  const n = CFG.paths[p].questions.length;
+  let extra = '';
+  if(q.type==='choice'){
+    extra = (q.options||[]).map((o,oi)=>`
+      <div class="qitem" style="margin-top:10px">
+        <div class="qitem-head"><span class="qlabel">Opcja ${oi+1}</span></div>
+        <div class="grid2">
+          <div class="srow"><label>Etykieta przycisku</label><input type="text" data-qfield="${p}|${i}|opt:${oi}:label" value="${esc(o.label)}"></div>
+          <div class="srow"><label>Wpis do notatki</label><input type="text" data-qfield="${p}|${i}|opt:${oi}:noteValue" value="${esc(o.noteValue||'')}"></div>
+        </div>
+        <div class="srow"><label>Tekst mówiony po wyborze (pusty = brak)</label>
+          <textarea data-qfield="${p}|${i}|opt:${oi}:followup">${esc(o.followup||'')}</textarea></div>
+      </div>`).join('');
+  } else {
+    extra = `<div class="srow"><label>Dodatkowy tekst mówiony po pytaniu (pusty = brak)</label>
+      <textarea data-qfield="${p}|${i}|after">${esc(q.after||'')}</textarea></div>`;
+  }
+  return `<div class="qitem">
+    <div class="qitem-head">
+      <span class="qlabel">Pytanie ${i+1}</span>
+      <button class="icobtn" type="button" data-qmove="${p}|${i}|up" ${i===0?'disabled':''} title="W górę">↑</button>
+      <button class="icobtn" type="button" data-qmove="${p}|${i}|down" ${i===n-1?'disabled':''} title="W dół">↓</button>
+      <button class="icobtn del" type="button" data-qdel="${p}|${i}" title="Usuń">✕</button>
+    </div>
+    <div class="grid2">
+      <div class="srow"><label>Etykieta w notatce</label><input type="text" data-qfield="${p}|${i}|note" value="${esc(q.note)}"></div>
+      <div class="srow"><label>Typ odpowiedzi</label>
+        <div class="seg" style="width:100%"><select data-qtype="${p}|${i}" style="width:100%;font:inherit;font-size:14px;border:none;background:transparent;color:var(--text);padding:7px 10px;outline:none">
+          <option value="short" ${q.type==='short'?'selected':''}>Krótki tekst</option>
+          <option value="long" ${q.type==='long'?'selected':''}>Dłuższa odpowiedź</option>
+          <option value="choice" ${q.type==='choice'?'selected':''}>Wybór (przyciski)</option>
+          <option value="city" ${q.type==='city'?'selected':''}>Miejscowość + województwo</option>
+        </select></div></div>
+    </div>
+    <div class="srow"><label>Treść pytania (mówiona)</label>
+      <textarea data-qfield="${p}|${i}|speech">${esc(q.speech)}</textarea></div>
+    ${q.type!=='choice' ? `<div class="srow"><label>Podpowiedź dla handlowca (pusta = brak)</label>
+      <input type="text" data-qfield="${p}|${i}|hint" value="${esc(q.hint||'')}"></div>` : ''}
+    ${extra}
+  </div>`;
+}
+function objItemHTML(o,i){
+  const n = CFG.objections.length;
+  return `<div class="qitem">
+    <div class="qitem-head">
+      <span class="qlabel">Obiekcja ${i+1}</span>
+      <button class="icobtn" type="button" data-omove="${i}|up" ${i===0?'disabled':''} title="W górę">↑</button>
+      <button class="icobtn" type="button" data-omove="${i}|down" ${i===n-1?'disabled':''} title="W dół">↓</button>
+      <button class="icobtn del" type="button" data-odel="${i}" title="Usuń">✕</button>
+    </div>
+    <div class="srow"><label>Nazwa na kafelku (słowa klienta)</label>
+      <input type="text" data-ofield="${i}|label" value="${esc(o.label)}"></div>
+    <div class="srow"><label>Odpowiedź zbijająca (mówiona przez handlowca)</label>
+      <textarea data-ofield="${i}|answer" style="min-height:110px">${esc(o.answer)}</textarea></div>
+  </div>`;
+}
+function areaItemHTML(a,i){
+  const n = CFG.areas.length;
+  return `<div class="qitem">
+    <div class="qitem-head">
+      <span class="qlabel">Obszar ${i+1}</span>
+      <button class="icobtn" type="button" data-amove="${i}|up" ${i===0?'disabled':''} title="W górę">↑</button>
+      <button class="icobtn" type="button" data-amove="${i}|down" ${i===n-1?'disabled':''} title="W dół">↓</button>
+      <button class="icobtn del" type="button" data-adel="${i}" title="Usuń">✕</button>
+    </div>
+    <div class="srow"><label>Nazwa (na kafelku i w notatce)</label>
+      <input type="text" data-afield="${i}|label" value="${esc(a.label)}"></div>
+    <div class="srow"><label>Odpowiedź handlowca (prezentacja)</label>
+      <textarea data-afield="${i}|answer" style="min-height:110px">${esc(a.answer)}</textarea></div>
+  </div>`;
+}
+
+function genderPreviewText(){
+  const d = S.clientName ? declineName(S.clientName, S.gender) : null;
+  if(!d) return 'wykrywane automatycznie z imienia — możesz nadpisać ręcznie';
+  return S.gender==='f'
+    ? `„Pani ${d.voc}" · „z Panią ${d.instr}"`
+    : `„Panie ${d.voc}" · „z Panem ${d.instr}"`;
+}
+function genderBlockHTML(){
+  return `<div class="field"><label>Forma zwracania się <span id="gAuto">${S.genderManual?'(ustawiona ręcznie)':'(auto z imienia)'}</span></label>
+    <div class="seg">
+      <button type="button" id="gM" class="${S.gender!=='f'?'on':''}">Pan</button>
+      <button type="button" id="gF" class="${S.gender==='f'?'on':''}">Pani</button>
+    </div>
+    <div class="gpreview" id="gPrev">${esc(genderPreviewText())}</div></div>`;
+}
+function bindGenderUI(onChange){
+  const upd = ()=>{
+    const gm=$('#gM'), gf=$('#gF'), gp=$('#gPrev'), ga=$('#gAuto');
+    if(gm) gm.classList.toggle('on', S.gender!=='f');
+    if(gf) gf.classList.toggle('on', S.gender==='f');
+    if(gp) gp.textContent = genderPreviewText();
+    if(ga) ga.textContent = S.genderManual?'(ustawiona ręcznie)':'(auto z imienia)';
+  };
+  const set = g=>{
+    S.gender=g; S.genderManual=true; save(); upd(); renderNote();
+    if(onChange) onChange();
+  };
+  const gm=$('#gM'), gf=$('#gF');
+  if(gm) gm.onclick = ()=>set('m');
+  if(gf) gf.onclick = ()=>set('f');
+  return upd;
+}
+
+function renderAreasPick(el, which){
+  const isW1 = which==='w1';
+  const speech = isW1 ? CFG.wspolne.w1 : CFG.wspolne.w2;
+  el.innerHTML = `<div class="card">
+    <span class="tag">[${isW1?'W1':'W2'}] ${isW1?'Na czym mu zależy':'Na czym jeszcze mu zależy'}</span>
+    <p class="speech">${fill(speech)}</p>
+    <div class="hint">💡 Zaznacz obszary, które klient wymienił${isW1?'':' — poprzednie zostają zaznaczone'}.</div>
+    <div class="areas">${CFG.areas.map(a=>{
+      const on = S.priorities.includes(a.id);
+      return `<button type="button" class="area ${on?'on':''}" data-area="${a.id}">
+        <span class="tick">${on?'✓':''}</span><span>${esc(a.label)}</span></button>`;
+    }).join('')}</div>
+    <div class="navrow">
+      <button class="btn btn-ghost" id="backBtn" type="button">‹ Wstecz</button>
+      <button class="btn btn-primary" id="nextBtn" type="button">${isW1?'Dalej — dopytaj o więcej ›':'Nic więcej — przejdź do podsumowania ›'}</button>
+    </div></div>`;
+  el.querySelectorAll('[data-area]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const id = btn.dataset.area;
+      const i = S.priorities.indexOf(id);
+      if(i>=0) S.priorities.splice(i,1); else S.priorities.push(id);
+      save(); render();
+    };
+  });
+  el.querySelector('#backBtn').onclick = back;
+  el.querySelector('#nextBtn').onclick = ()=> go(isW1?'w2':'w3');
+}
+
+/* ================= NOTE ================= */
+
+function buildNote(){
+  const L = [];
+  const now = new Date();
+  const dt = now.toLocaleDateString('pl-PL',{day:'2-digit',month:'2-digit',year:'numeric'})
+    + ', ' + now.toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'});
+  L.push('NOTATKA Z ROZMOWY — M&B Biuro Rachunkowe');
+  L.push('Data: ' + dt);
+  L.push('Klient: ' + (S.clientName ? S.clientName + (S.gender==='f'?' (Pani)':' (Pan)') : '—'));
+  if(S.path) L.push('Ścieżka: ' + CFG.paths[S.path].label);
+  const A = S.answers;
+  const wywiad = [];
+  if(S.path){
+    CFG.paths[S.path].questions.forEach(q=>{
+      if(A[q.id]) wywiad.push(q.note + ': ' + A[q.id]);
+      if(q.type==='city' && A.wojewodztwo) wywiad.push('Województwo: ' + A.wojewodztwo);
+    });
+  }
+  if(S.emp!==null) wywiad.push('Pracownicy: ' + (S.emp ? ('TAK' + (S.empCount?` (${S.empCount})`:'')) : 'NIE'));
+  if(wywiad.length){ L.push(''); L.push('— WYWIAD —'); L.push(...wywiad); }
+  const prio = S.priorities.map(id=>CFG.areas.find(a=>a.id===id)).filter(Boolean);
+  if(prio.length){
+    L.push(''); L.push('— PRIORYTETY KLIENTA —');
+    prio.forEach(a=> L.push('• ' + a.label));
+  }
+  if(A.reakcjaTxt || S.reakcja){
+    L.push(''); L.push('— PO PREZENTACJI —');
+    if(S.reakcja) L.push('Reakcja: ' + S.reakcja);
+    if(A.reakcjaTxt) L.push('Wypowiedź klienta: ' + A.reakcjaTxt);
+  }
+  if(S.objectionsRaised.length){
+    const labels = S.objectionsRaised.map(id=>CFG.objections.find(o=>o.id===id)?.label).filter(Boolean);
+    if(labels.length){
+      L.push(''); L.push('— OBIEKCJE OMÓWIONE —');
+      labels.forEach(l=> L.push('• ' + l));
+    }
+  }
+  const phasesDone = STEPS[S.step] && STEPS[S.step].phase >= 4;
+  if(S.path && phasesDone){
+    const blk = CFG.prices[priceBlockId()];
+    L.push(''); L.push('— WYCENA —');
+    L.push(blk.name.replace(' · ', ' — ') + ': ' + blk.note);
+  }
+  if(S.wynik || A.closeTxt){
+    L.push(''); L.push('— ZAMKNIĘCIE —');
+    if(S.wynik) L.push('Wynik: ' + (S.wynik==='TAK' ? 'TAK — działamy ✅' : 'NIE / obiekcje ❌'));
+    if(A.closeTxt) L.push('Odpowiedź klienta: ' + A.closeTxt);
+    if(A.obiekcja) L.push('Obiekcja (własna notatka): ' + A.obiekcja);
+    if(S.termin) L.push('Termin onboardingu: ' + S.termin);
+    if(A.pierwszyMiesiac) L.push('Pierwszy miesiąc księgowania: ' + A.pierwszyMiesiac + (S.info6 ? ' (start po 6. dniu — poinformowano, że księgowanie nie będzie terminowe)' : ''));
+    if(S.pelnomocnictwa) L.push('Pełnomocnictwa: ' + S.pelnomocnictwa);
+    if(S.kontoUS) L.push('Konto organizacji w US: ' + S.kontoUS);
+    if(S.dokPoprzednie) L.push('Dokumenty od poprzedniego biura: ' + S.dokPoprzednie);
+    if(S.popTel) L.push('Tel. poprzedniego biura: ' + S.popTel);
+    if(S.popMail) L.push('Mail poprzedniego biura: ' + S.popMail);
+    if(S.popTermin) L.push('Klient prześle dane biura: ' + S.popTermin);
+    if(S.z6) L.push('Uwagi końcowe: ' + S.z6);
+  }
+  const todo = [];
+  if(S.path && CFG.paths[S.path].optyTodo) todo.push('przekazać dane do działu optymalizacji');
+  const cityQ = S.path ? CFG.paths[S.path].questions.find(q=>q.type==='city') : null;
+  if((cityQ && A[cityQ.id]) || A.wojewodztwo){
+    todo.push('sprawdzić aktualne nabory dotacji' + (A.wojewodztwo ? ' — woj. ' + A.wojewodztwo : ' dla regionu klienta') + ' i przekazać partnerowi');
+  }
+  if(S.pelnomocnictwa.startsWith('sam')) todo.push('wysłać instrukcję pełnomocnictw');
+  if(S.kontoUS.startsWith('brak')) todo.push('wysłać instrukcję założenia konta organizacji w US');
+  if(S.dokPoprzednie.startsWith('klient')) todo.push('wysłać listę dokumentów do pozyskania');
+  if(S.dokPoprzednie.startsWith('zleca') && S.popTermin) todo.push('wysłać SMS z adresem mailowym do przesłania danych biura');
+  if(S.path && todo.length && S.wynik==='TAK'){
+    L.push(''); L.push('— DO ZROBIENIA —');
+    todo.forEach(t=> L.push('☐ ' + t));
+  }
+  return L.join('\n');
+}
+
+function renderNote(){
+  const t = buildNote();
+  $('#noteText').textContent = t;
+  $('#noteText2').textContent = t;
+  /* SMS pokazujemy dopiero po zakończeniu całej rozmowy z wynikiem TAK —
+     wtedy wszystkie dane (termin, pełnomocnictwa, konto US, pierwszy miesiąc) są zebrane */
+  const smsReady = S.step==='end' && S.wynik==='TAK';
+  $('#smsPanel').style.display = smsReady ? '' : 'none';
+  $('#smsMWrap').style.display = smsReady ? '' : 'none';
+  if(smsReady){
+    const s = buildSms();
+    $('#smsText').textContent = s;
+    $('#smsTextM').textContent = s;
+  }
+  renderObjChips();
+}
+
+/* ---------- OBIEKCJE — stały panel ---------- */
+let objCurrent = null;
+function objChipsHTML(){
+  return CFG.objections.map(o=>{
+    const used = S.objectionsRaised.includes(o.id);
+    return `<button class="obj-chip ${used?'used':''}" type="button" data-objchip="${o.id}">${used?'✓ ':''}${esc(o.label)}</button>`;
+  }).join('');
+}
+function renderObjChips(){
+  const a = $('#objChips'), b = $('#objChipsSheet');
+  if(a) a.innerHTML = objChipsHTML();
+  if(b) b.innerHTML = objChipsHTML();
+  document.querySelectorAll('[data-objchip]').forEach(btn=>{
+    btn.onclick = ()=> openObjection(btn.dataset.objchip);
+  });
+}
+function renderObjBody(){
+  const body = $('#objBody');
+  const o = CFG.objections.find(x=>x.id===objCurrent);
+  body.innerHTML = o
+    ? `<p class="obj-answer">${fill(o.answer)}</p>`
+    : `<p class="obj-hintempty">Wybierz obiekcję powyżej — odpowiedź pojawi się tutaj i zostanie odnotowana w notatce.</p>`;
+}
+function openObjection(id){
+  objCurrent = id;
+  if(id && !S.objectionsRaised.includes(id)){ S.objectionsRaised.push(id); save(); }
+  renderObjBody();
+  renderObjChips();
+  renderNote();
+  $('#objSheet').classList.add('open');
+}
+
+function copySms(btn){
+  const t = buildSms();
+  const done = ()=>{
+    if(!btn) return;
+    const old = btn.textContent;
+    btn.textContent = 'SMS ✓';
+    btn.classList.add('ok');
+    setTimeout(()=>{ btn.textContent = old; btn.classList.remove('ok'); }, 1600);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(done).catch(()=>fallbackCopy(t, done));
+  } else fallbackCopy(t, done);
+}
+
+function copyNote(btn){
+  const t = buildNote();
+  const done = ()=>{
+    if(!btn) return;
+    const old = btn.textContent;
+    btn.textContent = 'Skopiowano ✓';
+    btn.classList.add('ok');
+    setTimeout(()=>{ btn.textContent = old; btn.classList.remove('ok'); }, 1600);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(done).catch(()=>fallbackCopy(t, done));
+  } else fallbackCopy(t, done);
+}
+function fallbackCopy(t, done){
+  const ta = document.createElement('textarea');
+  ta.value = t; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  document.body.removeChild(ta); done();
+}
+
+function resetCall(){
+  try{
+    S = freshState();
+    save(); render();
+    window.scrollTo({top:0});
+  }catch(err){
+    /* awaryjnie: wyczyść stan rozmowy i przeładuj stronę — reset ma działać zawsze */
+    try{ localStorage.removeItem('mb_script_state'); }catch(e){}
+    location.reload();
+  }
+}
+function askReset(){
+  /* zamknij wszystkie nakładki, żeby modal był na wierzchu i klikalny */
+  $('#sheet').classList.remove('open');
+  $('#objSheet').classList.remove('open');
+  showModal({
+    title:'Zacząć nową rozmowę?',
+    text:'Postęp obecnej rozmowy i notatka nie zapiszą się — zostaną wyczyszczone. Skopiuj notatkę do CRM, zanim zaczniesz od nowa.',
+    confirmLabel:'Tak, nowa rozmowa',
+    onConfirm: resetCall,
+  });
+}
+
+/* ================= INIT ================= */
+
+/* delegacja na dokumencie — reset działa niezależnie od kroku i stanu ekranu */
+document.addEventListener('click', e=>{
+  if(e.target.closest('#resetBtn')) askReset();
+});
+/* Ustawienia widoczne tylko przy otwarciu linku z #MKD2026 —
+   handlowcy z czystym linkiem w ogóle nie widzą przycisku. */
+const SETTINGS_HASH = 'mkd2026';
+function settingsAllowed(){
+  try{ if(sessionStorage.getItem('mb_set_auth')==='1') return true; }catch(e){}
+  return location.hash.replace('#','').toLowerCase() === SETTINGS_HASH;
+}
+function updateSettingsBtn(){
+  const ok = settingsAllowed();
+  $('#settingsBtn').style.display = ok ? '' : 'none';
+  if(ok){ try{ sessionStorage.setItem('mb_set_auth','1'); }catch(e){} }
+}
+addEventListener('hashchange', updateSettingsBtn);
+function enterSettings(){
+  S.settingsReturn = S.step; S.step = 'settings';
+  save(); render(); window.scrollTo({top:0});
+}
+$('#settingsBtn').onclick = ()=>{
+  if(!settingsAllowed()) return;
+  if(S.step==='settings'){
+    S.step = S.settingsReturn || 'setup'; S.settingsReturn=null;
+    save(); render(); window.scrollTo({top:0});
+    return;
+  }
+  enterSettings();
+};
+$('#copyBtn').onclick = e=> copyNote(e.target);
+$('#copyBtn2').onclick = e=> copyNote(e.target);
+$('#copyHeadBtn').onclick = e=> copyNote(e.target);
+$('#mCopy').onclick = e=> copyNote(e.target);
+$('#smsBtn').onclick = e=> copySms(e.target);
+$('#smsBtn2').onclick = e=> copySms(e.target);
+$('#mFab').onclick = ()=> $('#sheet').classList.add('open');
+$('#scrim').onclick = ()=> $('#sheet').classList.remove('open');
+$('#mObj').onclick = ()=>{ objCurrent=null; renderObjBody(); renderObjChips(); $('#objSheet').classList.add('open'); };
+$('#objClose').onclick = ()=> $('#objSheet').classList.remove('open');
+$('#objScrim').onclick = ()=> $('#objSheet').classList.remove('open');
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape'){ $('#modal').classList.remove('open'); $('#sheet').classList.remove('open'); $('#objSheet').classList.remove('open'); }
+});
+
+CFG = loadConfig();
+S = load();
+if(S.step==='settings' && !S.settingsReturn) S.settingsReturn = 'setup';
+updateSettingsBtn();
+render();
+</script>
+
