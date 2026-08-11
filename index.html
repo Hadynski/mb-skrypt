@@ -262,6 +262,28 @@ details.crbr .body{padding:14px 16px;font-size:15px;line-height:1.6;color:var(--
 }
 @keyframes up{from{transform:translateY(30px);opacity:.6}to{transform:none;opacity:1}}
 .grab{width:36px;height:5px;border-radius:3px;background:var(--line);margin:10px auto 0}
+/* ---------- LOCK ---------- */
+.lock{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
+.lock-card{
+  background:var(--card);border-radius:20px;box-shadow:var(--shadow);
+  padding:38px 32px 30px;max-width:360px;width:100%;text-align:center;
+}
+.lock-card h2{margin:0 0 6px;font-size:21px;font-weight:800;letter-spacing:-.02em}
+.lock-card p{margin:0 0 22px;color:var(--text2);font-size:14px;line-height:1.5}
+#lockInput{
+  width:100%;font:inherit;font-size:17px;color:var(--text);text-align:center;
+  background:var(--card2);border:1px solid var(--line);border-radius:12px;
+  padding:12px 14px;outline:none;margin-bottom:8px;letter-spacing:.15em;
+  -webkit-appearance:none;appearance:none;-webkit-text-security:disc;
+  transition:border-color .15s, box-shadow .15s;
+}
+#lockInput::placeholder{letter-spacing:0;color:var(--text3)}
+#lockInput:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.lock-err{min-height:18px;color:var(--red);font-size:13px;font-weight:600;margin-bottom:12px}
+.lock-card .btn{width:100%}
+@keyframes lockshake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-6px)}40%,60%{transform:translateX(6px)}}
+.lock-card.shake{animation:lockshake .4s}
+@media (prefers-reduced-motion:reduce){.lock-card.shake{animation:none}}
 /* ---------- MODAL ---------- */
 .modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:20px}
 .modal.open{display:flex}
@@ -340,6 +362,16 @@ details.sect > summary small{font-weight:500;font-size:13px;color:var(--text2)}
 @media (max-width:600px){.grid2{grid-template-columns:1fr}}
 </style>
 
+<div class="lock" id="lock" style="display:none">
+  <div class="lock-card">
+    <h2>M&amp;B Biuro Rachunkowe</h2>
+    <p>Skrypt sprzedażowy — dostęp dla zespołu.<br>Podaj hasło, żeby kontynuować.</p>
+    <input type="text" id="lockInput" placeholder="Hasło" autocomplete="off" spellcheck="false" autocapitalize="off">
+    <div class="lock-err" id="lockErr"></div>
+    <button class="btn btn-primary" id="lockBtn" type="button">Wejdź ›</button>
+  </div>
+</div>
+
 <header class="app">
   <div class="hbar">
     <div class="brand">M&amp;B Biuro Rachunkowe<small>Skrypt sprzedażowy</small></div>
@@ -374,7 +406,7 @@ details.sect > summary small{font-weight:500;font-size:13px;color:var(--text2)}
       </div>
     </aside>
   </main>
-  <p class="footer-note">Skrypt wewnętrzny M&amp;B · treści edytowalne w Ustawieniach · wersja 22 (10.08.2026)</p>
+  <p class="footer-note">Skrypt wewnętrzny M&amp;B · treści edytowalne w Ustawieniach · wersja 23 (10.08.2026)</p>
 </div>
 
 <div class="fabs" id="fabs">
@@ -2086,10 +2118,36 @@ document.addEventListener('keydown', e=>{
   if(e.key==='Escape'){ $('#modal').classList.remove('open'); $('#sheet').classList.remove('open'); $('#objSheet').classList.remove('open'); }
 });
 
+/* blokada wejściowa — hasło wpisywane raz na przeglądarkę */
+const APP_PASS_B64 = 'TUtESEkyMDI2';
+function initLock(){
+  let authed = false;
+  try{ authed = localStorage.getItem('mb_app_auth')==='1'; }catch(e){ authed = true; }
+  if(authed) return;
+  const lock = $('#lock');
+  lock.style.display = 'flex';
+  const inp = $('#lockInput');
+  const tryPass = ()=>{
+    if(inp.value === atob(APP_PASS_B64)){
+      try{ localStorage.setItem('mb_app_auth','1'); }catch(e){}
+      lock.style.display = 'none';
+    } else {
+      $('#lockErr').textContent = 'Nieprawidłowe hasło — spróbuj ponownie.';
+      const card = lock.querySelector('.lock-card');
+      card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+      inp.value = ''; inp.focus();
+    }
+  };
+  $('#lockBtn').onclick = tryPass;
+  inp.onkeydown = e=>{ if(e.key==='Enter') tryPass(); };
+  setTimeout(()=>inp.focus(), 50);
+}
+
 CFG = loadConfig();
 S = load();
 if(S.step==='settings' && !S.settingsReturn) S.settingsReturn = 'setup';
 updateSettingsBtn();
 render();
+initLock();
 </script>
 
