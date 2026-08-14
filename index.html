@@ -262,6 +262,27 @@ details.crbr .body{padding:14px 16px;font-size:15px;line-height:1.6;color:var(--
 }
 @keyframes up{from{transform:translateY(30px);opacity:.6}to{transform:none;opacity:1}}
 .grab{width:36px;height:5px;border-radius:3px;background:var(--line);margin:10px auto 0}
+/* ---------- TREE (drzewko rozmowy) ---------- */
+.tree-body{overflow-y:auto;padding:6px 22px 26px}
+.tree-phase{
+  font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--text3);margin:20px 0 8px;
+}
+.tree-phase:first-child{margin-top:8px}
+.tree-note{font-size:13px;color:var(--text3);padding:6px 2px 10px}
+.tree-row{
+  display:flex;align-items:center;gap:8px;width:100%;text-align:left;
+  font:inherit;font-size:14.5px;color:var(--text);background:none;border:none;cursor:pointer;
+  padding:9px 10px;border-radius:10px;transition:background .12s;
+}
+.tree-row:hover:not(:disabled){background:var(--card2)}
+.tree-row:active:not(:disabled){transform:scale(.99)}
+.tree-row.sub{padding-left:26px;font-size:13.5px;color:var(--text2)}
+.tree-row.active{background:var(--accent-soft);color:var(--accent);font-weight:700}
+.tree-row.active .tree-dot{background:var(--accent)}
+.tree-row:disabled{color:var(--text3);cursor:default;opacity:.55}
+.tree-dot{width:6px;height:6px;border-radius:999px;background:var(--line);flex:none}
+.tree-row small{margin-left:auto;color:var(--text3);font-weight:500;font-size:12px}
 /* ---------- LOCK ---------- */
 .lock{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
 .lock-card{
@@ -377,6 +398,7 @@ details.sect > summary small{font-weight:500;font-size:13px;color:var(--text2)}
     <div class="brand">M&amp;B Biuro Rachunkowe<small>Skrypt sprzedażowy</small></div>
     <nav class="phases" id="phases" aria-label="Etapy rozmowy"></nav>
     <button class="hbtn hbtn-copy" id="copyHeadBtn" type="button">⧉ Kopiuj notatkę</button>
+    <button class="hbtn" id="treeBtn" type="button">🌳 Drzewko</button>
     <button class="hbtn" id="settingsBtn" type="button">⚙︎ Ustawienia</button>
     <button class="hbtn" id="resetBtn" type="button">Nowa rozmowa</button>
   </div>
@@ -410,9 +432,22 @@ details.sect > summary small{font-weight:500;font-size:13px;color:var(--text2)}
 </div>
 
 <div class="fabs" id="fabs">
+  <button class="mnotes-fab fab-copy" id="mTree" type="button">🌳 Drzewko</button>
   <button class="mnotes-fab fab-copy" id="mObj" type="button">Obiekcje</button>
   <button class="mnotes-fab fab-copy" id="mCopy" type="button">⧉ Kopiuj</button>
   <button class="mnotes-fab" id="mFab" type="button">Notatka</button>
+</div>
+
+<div class="sheet" id="treeSheet" role="dialog" aria-label="Drzewko rozmowy">
+  <div class="scrim" id="treeScrim"></div>
+  <div class="panel">
+    <div class="grab"></div>
+    <div class="notes-head">
+      <h3>Drzewko rozmowy</h3>
+      <button class="copy-btn" id="treeClose" type="button">Zamknij</button>
+    </div>
+    <div class="tree-body" id="treeBody"></div>
+  </div>
 </div>
 
 <div class="sheet" id="objSheet" role="dialog" aria-label="Obiekcje">
@@ -925,8 +960,29 @@ function go(id){
   save(); render();
   window.scrollTo({top:0, behavior:'smooth'});
 }
+/* jak go(), ale NIE dopisuje wpisu do historii — do użytku wyłącznie przy
+   automatycznych przekierowaniach wewnątrz render() (np. brak/koniec danych
+   dla bieżącego kroku), gdzie użytkownik nigdy "nie widział" kroku pośredniego.
+   Używanie go() w takich miejscach zostawia martwe wpisy w historii, które
+   „Wstecz” później zdejmuje w złym momencie — stąd pętle nawigacji. */
+function goReplace(id){
+  S.step = id;
+  save(); render();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
 function back(){
   if(S.history.length){ S.step = S.history.pop(); save(); render(); }
+}
+/* nawigacja z drzewka — jak go(), ale pozwala od razu ustawić dodatkowy
+   stan (np. który obszar/pytanie/obiekcja), zanim wyrenderujemy krok */
+function jumpTo(id, patch){
+  if(patch) patch(S);
+  S.history.push(S.step);
+  S.step = id;
+  save();
+  $('#treeSheet').classList.remove('open');
+  render();
+  window.scrollTo({top:0, behavior:'smooth'});
 }
 function priceBlockId(){
   const emp = S.priceOverride !== null ? S.priceOverride : !!S.emp;
@@ -1079,6 +1135,8 @@ function render(){
   $('#notesCol').style.display = isSettings ? 'none' : '';
   $('#fabs').classList.toggle('hidden', isSettings);
   $('#copyHeadBtn').style.display = isSettings ? 'none' : '';
+  $('#treeBtn').style.display = isSettings ? 'none' : '';
+  if(isSettings) $('#treeSheet').classList.remove('open');
   renderPhases();
   const st = STEPS[S.step];
   const el = $('#stage');
@@ -1093,6 +1151,112 @@ function renderPhases(){
   const cur = STEPS[S.step] ? STEPS[S.step].phase : 0;
   $('#phases').innerHTML = PHASES.map((p,i)=>
     `<span class="phase ${i<cur?'done':''} ${i===cur?'active':''}">${i<cur?'✓ ':''}${p}</span>`).join('');
+}
+
+/* ================= DRZEWKO ROZMOWY =================
+   Statyczna mapa wszystkich kroków, w kolejności rozmowy, pogrupowana wg faz.
+   Węzły zależne od ścieżki (A/B/C/D) chowają się/blokują dopóki S.path nie jest
+   ustawione; Z4/Z4n tylko dla spółek (B/D), Z5* tylko dla przeniesień (C/D) —
+   uwzględnia wszystkie 4 ścieżki, pokazując zawsze to, co faktycznie dotyczy
+   bieżącej rozmowy. */
+const TREE = [
+  {phase:0, id:'setup', label:'Przygotowanie do rozmowy'},
+  {phase:0, id:'k0', label:'[0] Potwierdzenie kontaktu'},
+  {phase:0, id:'k1', label:'[1] Potwierdzenie imienia'},
+  {phase:0, id:'k2', label:'[2] Pytanie o intencję'},
+  {phase:0, id:'k2a', label:'[2a] Rozeznanie — czy ma firmę'},
+  {phase:0, id:'k2bT', label:'[2b] Rodzaj działalności (ma firmę)'},
+  {phase:0, id:'k2bN', label:'[2b] Planowana działalność (dopiero planuje)'},
+  {phase:1, id:'p1', label:'Zgoda na pytania', needsPath:true},
+  {phase:1, id:'pq', label:'Pytania wywiadu', needsPath:true, group:'questions'},
+  {phase:1, id:'pEmp', label:'Pracownicy', needsPath:true},
+  {phase:2, id:'w1', label:'[W1] Na czym mu zależy', needsPath:true},
+  {phase:2, id:'w2', label:'[W2] Na czym jeszcze mu zależy', needsPath:true},
+  {phase:2, id:'w3', label:'[W3] Podsumowanie', needsPath:true},
+  {phase:3, id:'w4', label:'[W4] Prezentacja rozwiązań', needsPath:true},
+  {phase:3, id:'w4a', label:'[W4a] Opis współpracy', needsPath:true},
+  {phase:3, id:'w4b', label:'[W4b] Wirtualne biuro — pytanie', needsPath:true},
+  {phase:3, id:'w4c', label:'[W4c] Wirtualne biuro — odpowiedź', needsPath:true},
+  {phase:3, id:'w5', label:'[W5] Reakcja klienta', needsPath:true},
+  {phase:3, id:'w6c', label:'[W6] Gdy klient pyta o cenę', needsPath:true, patch:s=>s.reakcja='pyta o cenę'},
+  {phase:3, id:'w6j', label:'[W6] Gdy wszystko jasne', needsPath:true, patch:s=>s.reakcja='wszystko jasne'},
+  {phase:4, id:'price', label:'Bloki cenowe', needsPath:true},
+  {phase:5, id:'close', label:'Pytanie zamykające', needsPath:true},
+  {phase:5, id:'zNo', label:'Obiekcje', needsPath:true, group:'objections'},
+  {phase:5, id:'zYes', label:'Gratulacje', needsPath:true, patch:s=>s.wynik='TAK'},
+  {phase:5, id:'sms', label:'Wysłanie linku', needsPath:true},
+  {phase:5, id:'smsFix', label:'SMS nie dotarł', needsPath:true},
+  {phase:5, id:'form', label:'Prowadzenie przez formularz', needsPath:true},
+  {phase:5, id:'z1', label:'[Z1] Umowa + opłata aktywacyjna', needsPath:true},
+  {phase:5, id:'z1a', label:'[Z1a] Propozycja terminu', needsPath:true},
+  {phase:5, id:'z1b', label:'[Z1a] Kolejny termin', needsPath:true},
+  {phase:5, id:'z1ok', label:'[Z1a] Termin potwierdzony', needsPath:true},
+  {phase:5, id:'zMies', label:'[Z1b] Pierwszy miesiąc rozliczeniowy', needsPath:true},
+  {phase:5, id:'zMies6', label:'[Z1b] Uprzedzenie o 6. dniu', needsPath:true},
+  {phase:5, id:'z2', label:'[Z2] Zapowiedź onboardingu', needsPath:true},
+  {phase:5, id:'z3', label:'[Z3] Pełnomocnictwa', needsPath:true},
+  {phase:5, id:'z4', label:'[Z4] Konto w US', needsPath:true, only:['B','D']},
+  {phase:5, id:'z4n', label:'[Z4] Konto w US — brak', needsPath:true, only:['B','D']},
+  {phase:5, id:'z5', label:'[Z5] Dokumenty od poprzedniego biura', needsPath:true, only:['C','D']},
+  {phase:5, id:'z5z', label:'[Z5] Zleca nam pozyskanie', needsPath:true, only:['C','D']},
+  {phase:5, id:'z5d', label:'[Z5] Dane poprzedniego biura', needsPath:true, only:['C','D']},
+  {phase:5, id:'z5u', label:'[Z5] Umów przesłanie danych', needsPath:true, only:['C','D']},
+  {phase:5, id:'z6', label:'[Z6] Domknięcie organizacyjne', needsPath:true},
+  {phase:5, id:'end', label:'Zakończenie rozmowy', needsPath:true},
+];
+function treeRowHTML(label, active, disabled, jumpId, sub){
+  return `<button class="tree-row${sub?' sub':''}${active?' active':''}" type="button"
+    ${disabled?'disabled':`data-jump="${esc(jumpId)}"`}>
+    ${sub?'':'<span class="tree-dot"></span>'}<span>${esc(label)}</span></button>`;
+}
+function renderTree(){
+  const body = $('#treeBody');
+  if(!body) return;
+  let h = '';
+  let lastPhase = -1;
+  const jumps = {}; // id -> {patch, idx, objId}
+  let n = 0;
+  TREE.forEach(node=>{
+    if(node.only && !(S.path && node.only.includes(S.path))) return;
+    if(node.phase !== lastPhase){ h += `<div class="tree-phase">${esc(PHASES[node.phase])}</div>`; lastPhase = node.phase; }
+    const locked = node.needsPath && !S.path;
+    if(node.group==='questions'){
+      if(locked){ h += `<div class="tree-note">Wybierz ścieżkę, żeby zobaczyć pytania wywiadu</div>`; return; }
+      const qs = CFG.paths[S.path].questions;
+      qs.forEach((q,i)=>{
+        const jid = 'j'+(n++);
+        jumps[jid] = {id:'pq', patch:s=>{ s.qIdx=i; }};
+        const active = S.step==='pq' && S.qIdx===i;
+        h += treeRowHTML(`[${S.path}${i+2}] ${q.note}`, active, false, jid, true);
+      });
+      return;
+    }
+    if(node.group==='objections'){
+      const active0 = S.step==='zNo';
+      const jid0 = 'j'+(n++); jumps[jid0] = {id:'zNo'};
+      h += treeRowHTML(node.label, active0 && !locked, locked, jid0, false);
+      if(locked) return;
+      CFG.objections.forEach(o=>{
+        const jid = 'j'+(n++);
+        jumps[jid] = {id:'zNoA', patch:s=>{ s.currentObjection=o.id; if(!s.objectionsRaised.includes(o.id)) s.objectionsRaised.push(o.id); }};
+        const active = S.step==='zNoA' && S.currentObjection===o.id;
+        const done = S.objectionsRaised.includes(o.id);
+        h += treeRowHTML((done?'✓ ':'') + o.label, active, false, jid, true);
+      });
+      return;
+    }
+    const jid = 'j'+(n++);
+    jumps[jid] = {id:node.id, patch:node.patch};
+    const active = S.step===node.id;
+    h += treeRowHTML(node.label, active, locked, jid, false);
+  });
+  body.innerHTML = h;
+  body.querySelectorAll('[data-jump]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const j = jumps[btn.dataset.jump];
+      if(j) jumpTo(j.id, j.patch);
+    };
+  });
 }
 
 function fieldHTML(f){
@@ -1222,7 +1386,7 @@ k1(el){
 /* --- generyczne pytanie wywiadu z konfiguracji --- */
 pq(el){
   const qs = CFG.paths[S.path].questions;
-  if(!qs.length || S.qIdx >= qs.length){ go('pEmp'); return; }
+  if(!qs.length || S.qIdx >= qs.length){ goReplace('pEmp'); return; }
   const q = qs[S.qIdx];
   const tag = `[${S.path}${S.qIdx+2}] ${q.note} · ${CFG.paths[S.path].label}`;
   let h = `<div class="card"><span class="tag">${esc(tag)}</span>
@@ -1288,7 +1452,11 @@ pqf(el){
       <button class="btn btn-primary" id="nextBtn" type="button">Dalej</button>
     </div></div>`;
   el.querySelector('#backBtn').onclick = back;
-  el.querySelector('#nextBtn').onclick = ()=>{ S.qIdx++; S.pqFollow=null; save(); S.step='pq'; render(); window.scrollTo({top:0,behavior:'smooth'}); };
+  el.querySelector('#nextBtn').onclick = ()=>{
+    S.qIdx++; S.pqFollow=null;
+    if(S.history[S.history.length-1]==='pq') S.history.pop(); /* konsumuje wpis dopisany przez go('pqf') */
+    S.step='pq'; save(); render(); window.scrollTo({top:0,behavior:'smooth'});
+  };
 },
 
 emp(el){
@@ -1343,7 +1511,7 @@ w3(el){
 
 w4(el){
   const ids = S.priorities.filter(id => CFG.areas.some(a=>a.id===id));
-  if(!ids.length){ go('w4a'); return; }
+  if(!ids.length){ goReplace('w4a'); return; }
 
   if(ids.length > 1){
     const blocks = ids.map(id=>{
@@ -1364,7 +1532,7 @@ w4(el){
     return;
   }
 
-  if(S.areaIdx >= ids.length){ go('w4a'); return; }
+  if(S.areaIdx >= ids.length){ goReplace('w4a'); return; }
   const area = CFG.areas.find(a=>a.id===ids[S.areaIdx]);
   const last = S.areaIdx === ids.length-1;
   const intro = CFG.wspolne.w4intro.replace('[obszar]', area.label.toLowerCase());
@@ -1420,7 +1588,7 @@ w4b(el){
 },
 
 w4c(el){
-  if(S.wbiuroZnaUsluge===null){ go('w4b'); return; }
+  if(S.wbiuroZnaUsluge===null){ goReplace('w4b'); return; }
   const txt = S.wbiuroZnaUsluge ? CFG.wspolpraca.wbiuroZna : CFG.wspolpraca.wbiuroNieZna;
   el.innerHTML = `<div class="card">
     <span class="tag">[W4c] Wirtualne biuro · ${S.wbiuroZnaUsluge?'klient zna usługę':'klient nie zna usługi'}</span>
@@ -1434,7 +1602,7 @@ w4c(el){
   </div>`;
   el.querySelector('#wbTak').onclick = ()=>{ S.wbiuroChce = true; save(); go('w5'); };
   el.querySelector('#wbNieDziekuje').onclick = ()=>{ S.wbiuroChce = false; save(); go('w5'); };
-  el.querySelector('#backBtn').onclick = ()=> go('w4b');
+  el.querySelector('#backBtn').onclick = back;
 },
 
 price(el){
@@ -1516,7 +1684,7 @@ zNo(el){
 
 zNoA(el){
   const o = CFG.objections.find(x=>x.id===S.currentObjection);
-  if(!o){ go('zNo'); return; }
+  if(!o){ goReplace('zNo'); return; }
   el.innerHTML = `<div class="card">
     <span class="tag">Obiekcja · ${esc(o.label)}</span>
     <p class="speech">${fill(o.answer)}</p>
@@ -2224,8 +2392,12 @@ $('#scrim').onclick = ()=> $('#sheet').classList.remove('open');
 $('#mObj').onclick = ()=>{ objCurrent=null; renderObjBody(); renderObjChips(); $('#objSheet').classList.add('open'); };
 $('#objClose').onclick = ()=> $('#objSheet').classList.remove('open');
 $('#objScrim').onclick = ()=> $('#objSheet').classList.remove('open');
+$('#treeBtn').onclick = ()=>{ renderTree(); $('#treeSheet').classList.add('open'); };
+$('#mTree').onclick = ()=>{ renderTree(); $('#treeSheet').classList.add('open'); };
+$('#treeClose').onclick = ()=> $('#treeSheet').classList.remove('open');
+$('#treeScrim').onclick = ()=> $('#treeSheet').classList.remove('open');
 document.addEventListener('keydown', e=>{
-  if(e.key==='Escape'){ $('#modal').classList.remove('open'); $('#sheet').classList.remove('open'); $('#objSheet').classList.remove('open'); }
+  if(e.key==='Escape'){ $('#modal').classList.remove('open'); $('#sheet').classList.remove('open'); $('#objSheet').classList.remove('open'); $('#treeSheet').classList.remove('open'); }
 });
 
 /* blokada wejściowa — hasło wpisywane raz na przeglądarkę */
