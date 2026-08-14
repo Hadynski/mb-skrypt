@@ -575,6 +575,19 @@ const DEFAULT_CONFIG = {
     w6cena: `Właśnie się do tego przymierzałem. Mam dla Pana wycenę gotową — powiem Panu, jak to u nas wygląda.`,
     w6jasne: `Cieszę się, że wszystko jest dla Pana klarowne. W takim razie chciałbym Panu jeszcze pokazać, jak wygląda nasza współpraca od strony rozliczenia, żeby miał Pan pełen obraz.`,
   },
+  wspolpraca: {
+    pauzaNote: `PAUZA — krótka przerwa handlowca przed tym blokiem`,
+    p1: `Panie {K}, teraz chciałbym krótko opowiedzieć, jak wygląda codzienna współpraca z naszym biurem.`,
+    p2: `Przede wszystkim – cały proces jest bardzo prosty i wygodny. Wszystkie faktury sprzedażowe może Pan wystawiać bezpośrednio z naszej bezpłatnej aplikacji online. Nasze księgowe mają do niej cały czas dostęp i samodzielnie, na bieżąco pobierają potrzebne dokumenty, dzięki czemu nie musi Pan nic przesyłać mailowo.`,
+    p3: `Raz w miesiącu, dodaje Pan w aplikacji zdjęcia lub skany faktur zakupowych – księgowa je pobierze i rozliczy Pana firmę. Następnie, otrzyma Pan poprzez ten portal, informację o podatkach i składkach do opłaty – które może Pan opłacić bezpośrednio z poziomu aplikacji.`,
+    p4: `Dodatkowo, w ramach abonamentu ma Pan konsultacje – można w każdej chwili dzwonić lub pisać do księgowej z pytaniami czy wątpliwościami, choć w pierwszym kroku zawsze polecałbym korzystać z asystenta AI, bo przez niego wszystko załatwi pan od ręki.`,
+    jasneQ: `To jest dla pana jasne?`,
+    windykacja: `Dodatkowo, jeśli kiedykolwiek pojawiłby się problem z Klientem, który Panu nie płaci, może nam Pan zlecić windykację na koszt dłużnika, więc zaopiekujemy się Panem z każdej strony.`,
+    wbiuroQ: `Jeszcze dopytam, ma pan stały adres korespondencyjny dla pana działalności, czy potrzebowałby pan takiej miejscówki? Nie wiem, czy zna pan taką usługę jak wirtualne biuro.`,
+    wbiuroNieZna: `W dużym skrócie polega to na tym, że udostępniamy panu nasz adres korespondencyjny dla pana działalności i obsługujemy za pana całą korespondencję przychodzącą, więc nie musi się pan obawiać, że przeoczy pan jakieś pismo z ZUS-u czy urzędu skarbowego albo nie będzie pan musiał jeździć na pocztę z awizo i stać w kolejce i marnować czasu.`,
+    wbiuroZna: `No to wie pan na pewno, jaka to jest wygoda, bo obsługujemy wtedy za pana korespondencję przychodzącą, więc nie musi się pan obawiać, że przeoczy pan jakieś pismo z ZUS-u czy urzędu skarbowego albo nie będzie pan musiał jeździć na pocztę z awizo i stać w kolejce i marnować czasu.`,
+    wbiuroOfertaQ: `To co, Panie {K}, uwzględnić Panu później w ofercie też to wirtualne biuro?`,
+  },
   areas: [
     {id:'doradztwo', label:'Doradztwo',
      answer:`Wie Pan, jak to zwykle wygląda: ktoś przeczyta na Facebooku, że estoński CIT albo ryczałt to złoto, i myśli sobie — ciekawe, jakby to wyszło u mnie. I na tym się kończy, bo trzeba dzwonić do księgowej, umawiać się, czekać. U nas pyta Pan o to asystenta AI w aplikacji i od razu dostaje odpowiedź policzoną na danych Pana firmy. A do tego mamy na pokładzie doradcę podatkowego — raz w roku, przed okienkiem na zmianę formy opodatkowania, sam wraca do Pana sytuacji i sprawdza, czy nie może Pan płacić mniej. I powiem szczerze — robimy to bo im mniej Pan płaci podatków, tym lepiej Panu idzie i tym dłużej Pan z nami zostaje, więc oboje mamy w tym interes.`},
@@ -707,6 +720,7 @@ function freshState(){
     priorities:[], areaIdx:0,
     emp:null, empCount:'',
     reakcja:'', priceOverride:null,
+    wbiuroZnaUsluge:null, wbiuroChce:null,
     objectionsRaised:[], currentObjection:null, info6:false,
     wynik:null, termin:'', pelnomocnictwa:'', kontoUS:'',
     dokPoprzednie:'', popTel:'', popMail:'', popTermin:'', z6:'',
@@ -966,6 +980,9 @@ const STEPS = {
   w3:{phase:2, tag:'[W3] Podsumowanie', custom:'w3'},
 
   w4:{phase:3, tag:'[W4] Prezentacja rozwiązań', custom:'w4'},
+  w4a:{phase:3, tag:'[W4a] Opis współpracy', custom:'w4a'},
+  w4b:{phase:3, tag:'[W4b] Wirtualne biuro — pytanie', custom:'w4b'},
+  w4c:{phase:3, tag:'[W4c] Wirtualne biuro — odpowiedź', custom:'w4c'},
   w5:{phase:3, tag:'[W5] Reakcja klienta', speech:sp(()=>CFG.wspolne.w5),
       fields:[{key:'reakcjaTxt', label:'Odpowiedź klienta', ta:true}],
       choices:[
@@ -1321,12 +1338,33 @@ w3(el){
       <button class="btn btn-primary" id="nextBtn" type="button">Klient potwierdził — prezentuję ›</button>
     </div></div>`;
   el.querySelector('#backBtn').onclick = back;
-  el.querySelector('#nextBtn').onclick = ()=>{ S.areaIdx = 0; go(S.priorities.length ? 'w4' : 'w5'); };
+  el.querySelector('#nextBtn').onclick = ()=>{ S.areaIdx = 0; go(S.priorities.length ? 'w4' : 'w4a'); };
 },
 
 w4(el){
   const ids = S.priorities.filter(id => CFG.areas.some(a=>a.id===id));
-  if(!ids.length || S.areaIdx >= ids.length){ go('w5'); return; }
+  if(!ids.length){ go('w4a'); return; }
+
+  if(ids.length > 2){
+    const blocks = ids.map(id=>{
+      const area = CFG.areas.find(a=>a.id===id);
+      const intro = CFG.wspolne.w4intro.replace('[obszar]', area.label.toLowerCase());
+      return `<p class="speech">${fill(intro)}</p><p class="speech">${fill(area.answer)}</p>`;
+    }).join('<hr style="border:none;border-top:1px solid var(--line);margin:18px 0">');
+    el.innerHTML = `<div class="card">
+      <span class="tag">[W4] Prezentacja · wszystkie ${ids.length} obszary naraz</span>
+      ${blocks}
+      <p class="speech"><b>${fill(CFG.wspolne.closingQ)}</b></p>
+      <div class="navrow">
+        <button class="btn btn-ghost" id="backBtn" type="button">‹ Wstecz</button>
+        <button class="btn btn-primary" id="nextBtn" type="button">Wszystkie obszary omówione ›</button>
+      </div></div>`;
+    el.querySelector('#backBtn').onclick = back;
+    el.querySelector('#nextBtn').onclick = ()=> go('w4a');
+    return;
+  }
+
+  if(S.areaIdx >= ids.length){ go('w4a'); return; }
   const area = CFG.areas.find(a=>a.id===ids[S.areaIdx]);
   const last = S.areaIdx === ids.length-1;
   const intro = CFG.wspolne.w4intro.replace('[obszar]', area.label.toLowerCase());
@@ -1344,8 +1382,59 @@ w4(el){
     if(S.areaIdx>0){ S.areaIdx--; save(); render(); } else back();
   };
   el.querySelector('#nextBtn').onclick = ()=>{
-    if(last){ go('w5'); } else { S.areaIdx++; save(); render(); window.scrollTo({top:0,behavior:'smooth'}); }
+    if(last){ go('w4a'); } else { S.areaIdx++; save(); render(); window.scrollTo({top:0,behavior:'smooth'}); }
   };
+},
+
+w4a(el){
+  el.innerHTML = `<div class="card">
+    <span class="tag">[W4a] Opis współpracy</span>
+    <div class="hint">💡 ${esc(CFG.wspolpraca.pauzaNote)}</div>
+    <p class="speech">${fill(CFG.wspolpraca.p1)}</p>
+    <p class="speech">${fill(CFG.wspolpraca.p2)}</p>
+    <p class="speech">${fill(CFG.wspolpraca.p3)}</p>
+    <p class="speech">${fill(CFG.wspolpraca.p4)}</p>
+    <p class="speech"><b>${fill(CFG.wspolpraca.jasneQ)}</b></p>
+    <p class="speech">${fill(CFG.wspolpraca.windykacja)}</p>
+    <div class="navrow">
+      <button class="btn btn-ghost" id="backBtn" type="button">‹ Wstecz</button>
+      <button class="btn btn-primary" id="nextBtn" type="button">Dalej ›</button>
+    </div></div>`;
+  el.querySelector('#backBtn').onclick = back;
+  el.querySelector('#nextBtn').onclick = ()=> go('w4b');
+},
+
+w4b(el){
+  el.innerHTML = `<div class="card">
+    <span class="tag">[W4b] Wirtualne biuro</span>
+    <p class="speech">${fill(CFG.wspolpraca.wbiuroQ)}</p>
+    <div class="choices">
+      <button class="choice" type="button" id="wbNie"><span>Klient nie zna usługi wirtualnego biura</span><span class="arr">›</span></button>
+      <button class="choice" type="button" id="wbZna"><span>Klient zna usługę wirtualnego biura</span><span class="arr">›</span></button>
+    </div>
+    <div class="navrow"><button class="btn btn-ghost" id="backBtn" type="button">‹ Wstecz</button></div>
+  </div>`;
+  el.querySelector('#wbNie').onclick = ()=>{ S.wbiuroZnaUsluge = false; save(); go('w4c'); };
+  el.querySelector('#wbZna').onclick = ()=>{ S.wbiuroZnaUsluge = true; save(); go('w4c'); };
+  el.querySelector('#backBtn').onclick = back;
+},
+
+w4c(el){
+  if(S.wbiuroZnaUsluge===null){ go('w4b'); return; }
+  const txt = S.wbiuroZnaUsluge ? CFG.wspolpraca.wbiuroZna : CFG.wspolpraca.wbiuroNieZna;
+  el.innerHTML = `<div class="card">
+    <span class="tag">[W4c] Wirtualne biuro · ${S.wbiuroZnaUsluge?'klient zna usługę':'klient nie zna usługi'}</span>
+    <p class="speech">${fill(txt)}</p>
+    <p class="speech"><b>${fill(CFG.wspolpraca.wbiuroOfertaQ)}</b></p>
+    <div class="choices">
+      <button class="choice" type="button" id="wbTak"><span>Tak — uwzględnić w ofercie</span><span class="arr">›</span></button>
+      <button class="choice" type="button" id="wbNieDziekuje"><span>Nie — pomijamy</span><span class="arr">›</span></button>
+    </div>
+    <div class="navrow"><button class="btn btn-ghost" id="backBtn" type="button">‹ Wstecz</button></div>
+  </div>`;
+  el.querySelector('#wbTak').onclick = ()=>{ S.wbiuroChce = true; save(); go('w5'); };
+  el.querySelector('#wbNieDziekuje').onclick = ()=>{ S.wbiuroChce = false; save(); go('w5'); };
+  el.querySelector('#backBtn').onclick = ()=> go('w4b');
 },
 
 price(el){
@@ -1520,6 +1609,22 @@ settings(el){
         <div id="arealist">${CFG.areas.map((a,i)=>areaItemHTML(a,i)).join('')}</div>
         <button class="addbtn" type="button" id="addArea">＋ Dodaj obszar</button>
       </div>
+    </div>
+  </details>
+
+  <details class="sect"><summary>Opis współpracy + wirtualne biuro <small>· [W4a–c] po prezentacji, przed W5</small><span class="chev">›</span></summary>
+    <div class="sect-body">
+      ${setRowInput('wspolpraca.pauzaNote','Notka dla handlowca (nie mówiona)')}
+      ${setRow('wspolpraca.p1','[W4a] Wstęp')}
+      ${setRow('wspolpraca.p2','[W4a] Aplikacja — wystawianie faktur')}
+      ${setRow('wspolpraca.p3','[W4a] Miesięczne rozliczenie — faktury zakupowe, podatki, składki')}
+      ${setRow('wspolpraca.p4','[W4a] Konsultacje + asystent AI')}
+      ${setRow('wspolpraca.jasneQ','[W4a] Pytanie zamykające — czy jasne')}
+      ${setRow('wspolpraca.windykacja','[W4a] Windykacja na koszt dłużnika')}
+      ${setRow('wspolpraca.wbiuroQ','[W4b] Pytanie o adres korespondencyjny / wirtualne biuro')}
+      ${setRow('wspolpraca.wbiuroNieZna','[W4c] Odpowiedź — klient NIE zna usługi')}
+      ${setRow('wspolpraca.wbiuroZna','[W4c] Odpowiedź — klient ZNA usługę')}
+      ${setRow('wspolpraca.wbiuroOfertaQ','[W4c] Pytanie zamykające — uwzględnić w ofercie')}
     </div>
   </details>
 
@@ -1913,6 +2018,11 @@ function buildNote(){
   if(prio.length){
     L.push(''); L.push('— PRIORYTETY KLIENTA —');
     prio.forEach(a=> L.push('• ' + a.label));
+  }
+  if(S.wbiuroChce!==null){
+    L.push(''); L.push('— WIRTUALNE BIURO —');
+    L.push('Znał usługę wcześniej: ' + (S.wbiuroZnaUsluge ? 'TAK' : 'NIE'));
+    L.push('Uwzględnić w ofercie: ' + (S.wbiuroChce ? 'TAK' : 'NIE'));
   }
   if(A.reakcjaTxt || S.reakcja){
     L.push(''); L.push('— PO PREZENTACJI —');
