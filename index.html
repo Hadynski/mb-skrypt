@@ -1345,7 +1345,7 @@ w4(el){
   const ids = S.priorities.filter(id => CFG.areas.some(a=>a.id===id));
   if(!ids.length){ go('w4a'); return; }
 
-  if(ids.length > 2){
+  if(ids.length > 1){
     const blocks = ids.map(id=>{
       const area = CFG.areas.find(a=>a.id===id);
       const intro = CFG.wspolne.w4intro.replace('[obszar]', area.label.toLowerCase());
