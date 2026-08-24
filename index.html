@@ -434,7 +434,7 @@ details.sect > summary small{font-weight:500;font-size:13px;color:var(--text2)}
       </div>
     </aside>
   </main>
-  <p class="footer-note">Skrypt wewnętrzny M&amp;B · treści edytowalne w Ustawieniach · wersja 23 (10.08.2026)</p>
+  <p class="footer-note">Skrypt wewnętrzny M&amp;B · treści edytowalne w Ustawieniach · wersja 24 (24.08.2026)</p>
 </div>
 
 <div class="fabs" id="fabs">
@@ -510,7 +510,7 @@ const MIEJSCOWOSC_Q = {
 const WOJEWODZTWA = ['dolnośląskie','kujawsko-pomorskie','lubelskie','lubuskie','łódzkie','małopolskie','mazowieckie','opolskie','podkarpackie','podlaskie','pomorskie','śląskie','świętokrzyskie','warmińsko-mazurskie','wielkopolskie','zachodniopomorskie'];
 
 const DEFAULT_CONFIG = {
-  version: 6,
+  version: 7,
   intro: {
     k0: `Dzień dobry, z tej strony {H}, M&B Biuro Rachunkowe. Zostawiono u nas prośbę o kontakt — czy to się zgadza?`,
     k1a: `W zgłoszeniu mam podane, że mam przyjemność z Panem {K} — czy to się zgadza?`,
@@ -631,7 +631,8 @@ const DEFAULT_CONFIG = {
   },
   areas: [
     {id:'doradztwo', label:'Doradztwo',
-     answer:`Wie Pan, jak to zwykle wygląda: ktoś przeczyta na Facebooku, że estoński CIT albo ryczałt to złoto, i myśli sobie — ciekawe, jakby to wyszło u mnie. I na tym się kończy, bo trzeba dzwonić do księgowej, umawiać się, czekać. U nas pyta Pan o to asystenta AI w aplikacji i od razu dostaje odpowiedź policzoną na danych Pana firmy. A do tego mamy na pokładzie doradcę podatkowego — raz w roku, przed okienkiem na zmianę formy opodatkowania, sam wraca do Pana sytuacji i sprawdza, czy nie może Pan płacić mniej. I powiem szczerze — robimy to bo im mniej Pan płaci podatków, tym lepiej Panu idzie i tym dłużej Pan z nami zostaje, więc oboje mamy w tym interes.`},
+     answer:`Wie Pan, jak to zwykle wygląda: ktoś przeczyta na Facebooku, że estoński CIT albo ryczałt to złoto, i myśli sobie — ciekawe, jakby to wyszło u mnie. I na tym się kończy, bo trzeba dzwonić do księgowej, umawiać się, czekać. U nas pyta Pan o to asystenta AI w aplikacji i od razu dostaje odpowiedź policzoną na danych Pana firmy. A do tego mamy na pokładzie doradcę podatkowego — raz w roku, przed okienkiem na zmianę formy opodatkowania, sam wraca do Pana sytuacji i sprawdza, czy nie może Pan płacić mniej. I powiem szczerze — robimy to bo im mniej Pan płaci podatków, tym lepiej Panu idzie i tym dłużej Pan z nami zostaje, więc oboje mamy w tym interes.`,
+     answerSpolka:`Wie Pan, jak to zwykle wygląda: ktoś przeczyta na Facebooku, że estoński CIT to złoto, i myśli sobie — ciekawe, jakby to wyszło u mnie. I na tym się kończy, bo trzeba dzwonić do księgowej, umawiać się, czekać. U nas pyta Pan o to asystenta AI w aplikacji i od razu dostaje odpowiedź policzoną na danych Pana firmy. I powiem szczerze — robimy to bo im mniej Pan płaci podatków, tym lepiej Panu idzie i tym dłużej Pan z nami zostaje, więc oboje mamy w tym interes.`},
     {id:'kontakt', label:'Stały kontakt',
      answer:`Klienci rzadko zmieniają biuro przez cenę — najczęściej przez frustrację: dzwoni się, trafia na kogoś nowego, tłumaczy wszystko od początku i czeka. U nas większość spraw załatwia Pan sam w panelu — faktury, podatki, dokumenty jednym zdjęciem, terminy — zanim w ogóle trzeba do kogoś dzwonić. Jak potrzebny jest człowiek, jest biuro obsługi klienta, dostępne od ręki, bez kolejki. A do tematów, które wymagają znajomości Pana firmy — dedykowana księgowa, która zna Pana kontekst od pierwszego dnia.`},
     {id:'proaktywnosc', label:'Proaktywność księgowych',
@@ -643,7 +644,8 @@ const DEFAULT_CONFIG = {
     {id:'terminowosc', label:'Terminowość',
      answer:`Tu jedno przeoczenie — deklaracja, składka ZUS, cokolwiek — kosztuje realne pieniądze, nie tylko nerwy. Dlatego u nas terminów pilnuje aplikacja, która przypomina o każdym z nich, i księgowa, której przy Pana terminie odpala się alert na pół ekranu — takiego się po prostu nie da przeoczyć. Efekt? Nasz wskaźnik błędów to dwanaście setnych procenta.`},
     {id:'optymalizacja', label:'Niższe podatki / optymalizacja',
-     answer:`Powiem Panu wprost, dlaczego zależy nam, żeby płacił Pan jak najmniej podatków: im lepiej Panu idzie, tym dłużej jest Pan z nami. Trzymamy kciuki, ale nie bezinteresownie — i właśnie dlatego może Pan nam ufać. Nasz doradca podatkowy raz w roku, przed okienkiem na zmianę formy opodatkowania, wraca do Pana sytuacji i sprawdza, czy nie da się płacić mniej. Nie z uprzejmości — z wzajemnej korzyści.`},
+     answer:`Powiem Panu wprost, dlaczego zależy nam, żeby płacił Pan jak najmniej podatków: im lepiej Panu idzie, tym dłużej jest Pan z nami. Trzymamy kciuki, ale nie bezinteresownie — i właśnie dlatego może Pan nam ufać. Nasz doradca podatkowy raz w roku, przed okienkiem na zmianę formy opodatkowania, wraca do Pana sytuacji i sprawdza, czy nie da się płacić mniej. Nie z uprzejmości — z wzajemnej korzyści.`,
+     answerSpolka:`Powiem Panu wprost, dlaczego zależy nam, żeby płacił Pan jak najmniej podatków: im lepiej Panu idzie, tym dłużej jest Pan z nami. Trzymamy kciuki, ale nie bezinteresownie — i właśnie dlatego może Pan nam ufać.`},
     {id:'bezpieczenstwo', label:'Bezpieczeństwo i zgodność z przepisami',
      answer:`Każde biuro powie Panu, że dba o Pana bezpieczeństwo. Ja Panu powiem z czego to wynika: firma z problemami podatkowymi to firma, która za chwilę nie ma nam czym zapłacić. Więc jak przychodzi pismo z urzędu, przesyła je Pan nam — my piszemy odpowiedź, robimy odwołanie, kontaktujemy się z urzędem w Pana imieniu. Na trudniejsze sprawy mamy własną kancelarię prawną. Motywacja prosta i finansowa — i dlatego może Pan na nas liczyć.`},
     {id:'branza', label:'Specyfika branży',
@@ -655,11 +657,12 @@ const DEFAULT_CONFIG = {
     {id:'obecne-biuro', label:'Muszę pogadać z obecnym biurem',
      answer:`Oczywiście, to fair wobec nich. Jedna rzecz z doświadczenia: takie rozmowy najczęściej kończą się obietnicą poprawy — i przez miesiąc faktycznie jest lepiej, a potem wszystko wraca do normy, bo problem nie leży w chęciach, tylko w sposobie pracy biura. My nie wymagamy od Pana zrywania niczego z dnia na dzień — całe przeniesienie, łącznie z odbiorem dokumentów, bierzemy na siebie. Więc może zróbmy tak: umówimy wstępnie termin, a jeśli po tamtej rozmowie zmieni Pan zdanie, po prostu da mi Pan znać. Nic Pana to nie kosztuje, a kalendarz nie ucieka.`},
     {id:'cena', label:'Za wysoka cena',
-     answer:`Rozumiem. Tylko porównajmy, co dokładnie Pan porównuje — bo samo „księgowanie dokumentów" to najmniejsza część tego, za co Pan płaci. W abonamencie ma Pan dedykowaną księgową, dział obsługi bez kolejki, aplikację, pilnowanie wszystkich terminów i dział optymalizacji, który raz w roku, kiedy otwiera się okienko na zmianę formy opodatkowania, sprawdza, czy nie może Pan płacić niższych podatków. Jedna dobrze wykorzystana optymalizacja albo jeden uniknięty błąd potrafi zwrócić roczny koszt naszej pracy z nawiązką. Tańsze biuro, które tego nie robi, jest tańsze tylko na fakturze — nie w Pana wyniku finansowym.`},
+     answer:`Rozumiem. Tylko porównajmy, co dokładnie Pan porównuje — bo samo „księgowanie dokumentów" to najmniejsza część tego, za co Pan płaci. W abonamencie ma Pan dedykowaną księgową, dział obsługi bez kolejki, aplikację, pilnowanie wszystkich terminów i dział optymalizacji, który raz w roku, kiedy otwiera się okienko na zmianę formy opodatkowania, sprawdza, czy nie może Pan płacić niższych podatków. Jedna dobrze wykorzystana optymalizacja albo jeden uniknięty błąd potrafi zwrócić roczny koszt naszej pracy z nawiązką. Tańsze biuro, które tego nie robi, jest tańsze tylko na fakturze — nie w Pana wyniku finansowym.`,
+     answerSpolka:`Rozumiem. Tylko porównajmy, co dokładnie Pan porównuje — bo samo „księgowanie dokumentów" to najmniejsza część tego, za co Pan płaci. W abonamencie ma Pan dedykowaną księgową, dział obsługi bez kolejki, aplikację i pilnowanie wszystkich terminów. Jeden uniknięty błąd potrafi zwrócić roczny koszt naszej pracy z nawiązką. Tańsze biuro, które tego nie robi, jest tańsze tylko na fakturze — nie w Pana wyniku finansowym.`},
     {id:'lokalne', label:'Wolałbym biuro lokalne',
      answer:`Rozumiem to podejście — kiedyś bliskość biura naprawdę miała znaczenie, bo dokumenty woziło się w teczce. Dziś dokument to zdjęcie w telefonie, a kontakt z księgową ma Pan szybszy niż z biurem po drugiej stronie ulicy — bez jeżdżenia i bez łapania kogoś w godzinach otwarcia. I powiem szczerze: lokalne biuro to najczęściej jedna osoba — jak choruje albo jedzie na urlop, Pana sprawy czekają. U nas Pana firmę zna dedykowana księgowa, a obok niej stoi cały dział obsługi, więc zawsze jest ktoś, kto przejmie temat od ręki.`},
     {id:'spotkanie', label:'Najpierw spotkanie z księgową',
-     answer:`Rozumiem potrzebę poznania osoby, która poprowadzi Pana firmę — i dokładnie temu służy nasz onboarding. To spotkanie, na którym dział obsługi przechodzi z Panem przez wszystko: portale, pełnomocnictwa, sposób pracy. A księgową, która Pana prowadzi, ma Pan potem pod ręką na co dzień, nie tylko na jednym spotkaniu. Różnica jest taka, że u nas ta rozmowa odbywa się już konkretnie na Pana firmie, nie teoretycznie. Więc zamiast dokładać sobie dodatkowe spotkanie „na sucho", proponuję umówić onboarding — pozna Pan i księgową, i sposób, w jaki pracujemy, od razu w działaniu.`},
+     answer:`Rozumiem potrzebę poznania osoby, która poprowadzi Pana firmę — i dokładnie temu służy nasze spotkanie organizacyjne. Dział obsługi przechodzi na nim z Panem przez wszystko: portale, dokumenty, sposób pracy. A księgową, która Pana prowadzi, ma Pan potem pod ręką na co dzień, nie tylko na jednym spotkaniu. Różnica jest taka, że u nas ta rozmowa odbywa się już konkretnie na Pana firmie, nie teoretycznie. Więc zamiast dokładać sobie dodatkowe spotkanie „na sucho", proponuję umówić spotkanie organizacyjne — pozna Pan i księgową, i sposób, w jaki pracujemy, od razu w działaniu.`},
   ],
   prices: {
     b1:{name:'Blok 1 · JDG bez pracowników', amount:'299 zł', per:'netto miesięcznie',
@@ -683,28 +686,22 @@ const DEFAULT_CONFIG = {
     crbr:`Centralny Rejestr Beneficjentów Rzeczywistych — państwowy rejestr właścicieli spółek. Każda nowa spółka ma tylko 7 dni na wpis, a brak wpisu to realne ryzyko kary nawet do miliona złotych. Nie jest to coś, o czym warto zapomnieć na starcie — dlatego mamy to w ofercie jako osobną pozycję, żeby Pan miał to z głowy od pierwszego dnia.`,
   },
   sms: {
-    main:`Dzień dobry Panie {K}, dziękuję za rozmowę i potwierdzam termin onboardingu: [termin]. Spotkanie potrwa ok. 1 h — proszę być wtedy przy komputerze. Przypominam też o opłacie aktywacyjnej 100 zł — znika, jeśli onboarding odbędzie się sprawnie w pierwszym umówionym terminie.`,
-    pelnomocnictwa:`Prześlemy Panu instrukcję złożenia pełnomocnictw — najlepiej zrobić to przed spotkaniem.`,
-    kontoUS:`Prześlemy też instrukcję założenia konta organizacji w Urzędzie Skarbowym — ważne, żeby konto było założone jeszcze przed onboardingiem, bez niego nie złożymy pełnomocnictw.`,
+    main:`Dzień dobry Panie {K}, dziękuję za rozmowę i potwierdzam termin spotkania organizacyjnego: [termin]. Spotkanie potrwa ok. 1 h — proszę być wtedy przy komputerze. Przypominam też o opłacie aktywacyjnej 100 zł — znika, jeśli spotkanie odbędzie się sprawnie w pierwszym umówionym terminie.`,
     miesiac:`Księgowanie zaczynamy od: [miesiąc].`,
     koniec:`W razie pytań jestem pod tym numerem. Pozdrawiam, [imię], M&B Biuro Rachunkowe.`,
   },
   closing: {
     close:`Panie {K}, to co — działamy?`,
-    gratulacje:`Dobra decyzja, Panie {K} — i mówię to nie dlatego, że tak wypada, tylko dlatego, że naprawdę wierzę, że możemy zawiązać tutaj fajną, długą współpracę. Teraz przejdziemy przez kilka kroków razem — proszę mi mówić, co Pan widzi na ekranie, a ja Pana poprowadzę.`,
-    sms:`Świetnie, Panie {K} — w takim razie właśnie wysłałem Panu link do rozpoczęcia współpracy. Niech Pan sprawdzi, czy SMS dotarł.`,
-    smsFixHint:`Działaj samodzielnie, żeby SMS dotarł do klienta (sprawdź numer, wyślij ponownie). Kontynuuj dopiero, gdy klient potwierdzi.`,
-    form:`Świetnie — teraz przejdziemy przez kilka kroków razem. Proszę mi mówić, co Pan widzi na ekranie, a ja Pana poprowadzę.`,
-    z1:`Panie {K}, widzę umowę — wszystko gra. To teraz od razu umówimy termin Pana onboardingu. Standardowo pobieramy opłatę aktywacyjną w wysokości 100 złotych — jednak jeśli przeprowadzimy onboarding sprawnie w pierwszym umówionym terminie, ta opłata znika. Dlatego proszę wybrać bezpieczny termin, w którym na pewno będzie Pan dostępny i przy komputerze. Oczywiście rozumiemy, że różne sytuacje się zdarzają — gdyby cokolwiek miało się zmienić lub coś wypaść, prosimy o informację możliwie jak najwcześniej.`,
+    gratulacje:`Dobra decyzja, Panie {K} — i mówię to nie dlatego, że tak wypada, tylko dlatego, że naprawdę wierzę, że możemy zawiązać tutaj fajną, długą współpracę. To teraz domkniemy kilka rzeczy organizacyjnych i już ruszamy.`,
+    dane:`Panie {K}, w takim razie za chwilkę wyślę Panu umowę na wskazany przez Pana adres mailowy. Żeby ją uzupełnić, muszę jeszcze zebrać od Pana dane — będę potrzebować, żeby wysłał mi Pan SMS-em albo podyktował NIP firmy oraz adres mailowy.`,
+    z1:`Teraz od razu umówimy termin Pana spotkania organizacyjnego. Standardowo pobieramy opłatę aktywacyjną w wysokości 100 złotych — jednak jeśli przeprowadzimy je sprawnie w pierwszym umówionym terminie, ta opłata znika. Dlatego proszę wybrać bezpieczny termin, w którym na pewno będzie Pan dostępny i przy komputerze. Oczywiście rozumiemy, że różne sytuacje się zdarzają — gdyby cokolwiek miało się zmienić lub coś wypaść, prosimy o informację możliwie jak najwcześniej.`,
     z1a:`Patrząc na dostępne terminy, mógłbym Panu zaproponować [termin] — czy taki termin Panu pasuje?`,
     z1b:`Rozumiem. W takim razie mam jeszcze [kolejny termin] — czy ten by Panu odpowiadał?`,
     z1bHint:`Proponuj kolejne wolne terminy pojedynczo, aż klient wybierze pasujący.`,
     miesiacQ:`I jeszcze jedno — od którego miesiąca mamy przejąć księgowanie: czy zależy Panu, żebyśmy zaksięgowali już bieżący miesiąc?`,
     szostyDzien:`Tu jedna ważna rzecz, o której uczciwie uprzedzam: dokumenty za dany miesiąc musimy mieć do 6. dnia miesiąca. Skoro startujemy później, ten pierwszy miesiąc zaksięgujemy — natomiast nie będzie to możliwe terminowo. Możemy to zrobić, chcę tylko, żeby Pan o tym wiedział z góry.`,
-    z2:`Zanim się rozłączymy, chcę Panu jeszcze w skrócie powiedzieć, jak będzie wyglądał sam onboarding, żeby nic Pana nie zaskoczyło. Po pierwsze — na spotkaniu będzie Pan potrzebował dostępu do komputera i możliwości udostępnienia ekranu. Na samym onboardingu dział obsługi klienta przejdzie z Panem przez kwestie organizacyjne związane z rozpoczęciem współpracy — między innymi złożą Państwo pełnomocnictwa i pokaże Panu portale, z których będzie Pan u nas korzystał.`,
-    z3:`Jeśli chodzi o same pełnomocnictwa — może Pan wybrać: albo prześlemy Panu instrukcję i złoży je Pan sam przed spotkaniem, albo przejdą Państwo przez to wspólnie na spotkaniu. Jak Panu wygodniej?`,
-    z4:`Jeszcze jedno przy spółce — czy posiada Pan konto organizacji w Urzędzie Skarbowym?`,
-    z4n:`Nic nie szkodzi — prześlemy Panu instrukcję, jak je założyć, i bardzo proszę o założenie go jeszcze przed spotkaniem. To ważne, bo bez tego konta nie da się złożyć pełnomocnictw podczas onboardingu.`,
+    z2:`Zanim się rozłączymy, chcę Panu jeszcze w skrócie powiedzieć, jak będzie wyglądało samo spotkanie organizacyjne, żeby nic Pana nie zaskoczyło. Po pierwsze — na spotkaniu będzie Pan potrzebował dostępu do komputera i możliwości udostępnienia ekranu. Na samym spotkaniu dział obsługi klienta przejdzie z Panem przez kwestie organizacyjne związane z rozpoczęciem współpracy — między innymi pokażemy Panu portale, z których będzie Pan u nas korzystał.`,
+    z3:`Jeszcze słowo o pełnomocnictwach. Wyślemy je Panu mailem w PDF — proszę je wydrukować, podpisać i odesłać do naszego biura pocztą. Sam skan mailem nie wystarczy, potrzebujemy papierowych oryginałów z podpisem. Bez pełnomocnictw nie możemy reprezentować Pana firmy w urzędach, więc im szybciej do nas wrócą, tym szybciej ruszamy.`,
     z5:`No i jeszcze dokumenty od Pana obecnego biura rachunkowego — tutaj ma Pan dwie opcje. Albo prześlemy Panu listę dokumentów, których potrzebujemy, a Pan dopilnowuje, żeby wszystko do nas trafiło — albo zleca to Pan nam i wtedy my zajmujemy się pozyskaniem dokumentów, a koszt to 100 złotych netto. Jak Pan woli?`,
     z5z:`Świetnie, w takim razie zajmiemy się tym za Pana. Będę potrzebował numeru telefonu oraz maila do Pana poprzedniego biura rachunkowego. Czy może mi Pan podać te dane od razu?`,
     z5u:`Nie ma problemu. W takim razie umówmy się konkretnie — kiedy będzie Pan mógł przesłać nam te dane? Podam Panu SMS-em maila, na który je Pan wyśle.`,
@@ -763,7 +760,7 @@ function freshState(){
     reakcja:'', priceOverride:null,
     wbiuroZnaUsluge:null, wbiuroChce:null,
     objectionsRaised:[], currentObjection:null, info6:false,
-    wynik:null, termin:'', pelnomocnictwa:'', kontoUS:'',
+    wynik:null, termin:'', nip:'', mail:'',
     dokPoprzednie:'', popTel:'', popMail:'', popTermin:'', z6:'',
     step:'setup', history:[], settingsReturn:null,
   };
@@ -831,7 +828,7 @@ function declineName(raw, gender){
    w oknie ±(2,6) słów wokół zwrotu grzecznościowego. */
 const PAN_MAP = {Pan:'Pani', Panu:'Pani', Panem:'Panią', Panie:'Pani'};
 const GEN_PREV = ['dla','do','u','od','według','wobec','bez','obok','koło','zamiast','oprócz'];
-const ACC_PREV = ['za','umawiamy','kosztuje','przeprowadzamy','zapraszamy','prosimy','poprowadzę','przeprowadzi','witam'];
+const ACC_PREV = ['za','przez','umawiamy','kosztuje','przeprowadzamy','zapraszamy','prosimy','poprowadzę','przeprowadzi','witam'];
 const ACC_NEXT = ['przez','z','ze','o','i','a','oraz','na','po','w','zna','poprowadzę','poprowadzi','to','nie','nic','tego'];
 const FEM_DICT = {
   wybrał:'wybrała', osiągnął:'osiągnęła', mógłby:'mogłaby', mógł:'mogła',
@@ -842,6 +839,7 @@ const FEM_DICT = {
   zdecydował:'zdecydowała', prowadził:'prowadziła', widział:'widziała',
   zobaczył:'zobaczyła', zdążył:'zdążyła', zapomniał:'zapomniała', podał:'podała',
   płacił:'płaciła', płaciłby:'płaciłaby', zapłacił:'zapłaciła', wybierał:'wybierała',
+  podyktował:'podyktowała', wydrukował:'wydrukowała', odesłał:'odesłała',
 };
 function toFemale(text){
   const parts = String(text).split(/([\p{L}]+|\{[KH]\})/u);
@@ -915,8 +913,6 @@ function fillText(text){
 function buildSms(){
   const parts = [];
   parts.push(fillText(CFG.sms.main).replace('[termin]', S.termin || '[termin]'));
-  if(S.pelnomocnictwa.startsWith('sam')) parts.push(fillText(CFG.sms.pelnomocnictwa));
-  if(S.kontoUS.startsWith('brak')) parts.push(fillText(CFG.sms.kontoUS));
   if(S.answers.pierwszyMiesiac) parts.push(fillText(CFG.sms.miesiac).replace('[miesiąc]', S.answers.pierwszyMiesiac));
   parts.push(fillText(CFG.sms.koniec));
   return parts.join(' ');
@@ -997,8 +993,10 @@ function priceBlockId(){
   if(S.path==='D') return emp ? 'b6' : 'b5';
   return 'b1';
 }
-function afterZ3(){ return (S.path==='B'||S.path==='D') ? 'z4' : afterZ4(); }
-function afterZ4(){ return (S.path==='C'||S.path==='D') ? 'z5' : 'z6'; }
+function isSpolka(){ return S.path==='B'||S.path==='D'; }
+/* treść obszaru/obiekcji: spółki mają własną wersję tam, gdzie wypełniono answerSpolka */
+function answerFor(item){ return (isSpolka() && item.answerSpolka) ? item.answerSpolka : item.answer; }
+function afterZ3(){ return (S.path==='C'||S.path==='D') ? 'z5' : 'z6'; }
 
 /* ================= STEP DEFINITIONS =================
    speech może być stringiem lub funkcją () => tekst z CFG. */
@@ -1064,15 +1062,13 @@ const STEPS = {
       ]},
   zNo:{phase:5, tag:'Obiekcje', custom:'zNo'},
   zNoA:{phase:5, tag:'Obiekcja', custom:'zNoA'},
-  zYes:{phase:5, tag:'Gratulacje', speech:sp(()=>CFG.closing.gratulacje), next:'sms'},
-  sms:{phase:5, tag:'Wysłanie linku', speech:sp(()=>CFG.closing.sms),
-      choices:[
-        {label:'TAK — dotarł', to:'form'},
-        {label:'NIE — nie dotarł', to:'smsFix'},
-      ]},
-  smsFix:{phase:5, tag:'SMS nie dotarł', hint:sp(()=>CFG.closing.smsFixHint),
-      nextLabel:'SMS dotarł — kontynuuj', next:'form'},
-  form:{phase:5, tag:'Prowadzenie przez formularz', speech:sp(()=>CFG.closing.form), next:'z1'},
+  zYes:{phase:5, tag:'Gratulacje', speech:sp(()=>CFG.closing.gratulacje), next:'dane'},
+  dane:{phase:5, tag:'Dane do umowy', speech:sp(()=>CFG.closing.dane),
+      fields:[
+        {key:'nip', label:'NIP firmy', ta:false, direct:'nip'},
+        {key:'mail', label:'Adres e-mail klienta (na niego idzie umowa)', ta:false, direct:'mail'},
+      ],
+      nextLabel:'Mam dane — dalej', next:'z1'},
   z1:{phase:5, tag:'[Z1] Umowa + opłata aktywacyjna', speech:sp(()=>CFG.closing.z1), next:'z1a'},
   z1a:{phase:5, tag:'[Z1a] Propozycja terminu', speech:sp(()=>CFG.closing.z1a),
       fields:[{key:'terminProp', label:'Proponowany termin (z kalendarza)', dt:true}],
@@ -1081,7 +1077,7 @@ const STEPS = {
         {label:'NIE PASUJE', to:'z1b'},
       ]},
   z1b:{phase:5, tag:'[Z1a — KOLEJNY]', speech:sp(()=>CFG.closing.z1b), hint:sp(()=>CFG.closing.z1bHint),
-      fields:[{key:'terminFinal', label:'Umówiony termin onboardingu (z kalendarza)', dt:true}],
+      fields:[{key:'terminFinal', label:'Umówiony termin spotkania organizacyjnego (z kalendarza)', dt:true}],
       nextLabel:'Termin umówiony — dalej', next:'zMies',
       onNext:s=>{ s.termin = fmtTermin(s.answers.terminFinal) || s.termin; }},
   zMies:{phase:5, tag:'[Z1b] Pierwszy miesiąc rozliczeniowy', speech:sp(()=>CFG.closing.miesiacQ),
@@ -1093,18 +1089,8 @@ const STEPS = {
       ]},
   zMies6:{phase:5, tag:'[Z1b] Uprzedzenie o terminie 6. dnia', speech:sp(()=>CFG.closing.szostyDzien), next:'z2'},
   z1ok:{phase:5, tag:'[Z1a] Termin potwierdzony', custom:'z1ok'},
-  z2:{phase:5, tag:'[Z2] Zapowiedź onboardingu', speech:sp(()=>CFG.closing.z2), next:'z3'},
-  z3:{phase:5, tag:'[Z3] Pełnomocnictwa', speech:sp(()=>CFG.closing.z3),
-      choices:[
-        {label:'Sam przed spotkaniem', sub:'dział obsługi wyśle instrukcję', dynTo:()=>afterZ3(), set:s=>s.pelnomocnictwa='sam przed spotkaniem (wysłać instrukcję)'},
-        {label:'Wspólnie na spotkaniu', sub:'temat domknięty na onboardingu', dynTo:()=>afterZ3(), set:s=>s.pelnomocnictwa='wspólnie na onboardingu'},
-      ]},
-  z4:{phase:5, tag:'[Z4] Konto organizacji w US · tylko spółka', speech:sp(()=>CFG.closing.z4),
-      choices:[
-        {label:'TAK — ma konto', dynTo:()=>afterZ4(), set:s=>s.kontoUS='ma'},
-        {label:'NIE — nie ma', to:'z4n', set:s=>s.kontoUS='brak — wysłać instrukcję, założyć przed spotkaniem'},
-      ]},
-  z4n:{phase:5, tag:'[Z4 — NIE]', speech:sp(()=>CFG.closing.z4n), dynNext:()=>afterZ4()},
+  z2:{phase:5, tag:'[Z2] Zapowiedź spotkania organizacyjnego', speech:sp(()=>CFG.closing.z2), next:'z3'},
+  z3:{phase:5, tag:'[Z3] Pełnomocnictwa', speech:sp(()=>CFG.closing.z3), dynNext:()=>afterZ3()},
   z5:{phase:5, tag:'[Z5] Dokumenty od poprzedniego biura · tylko przeniesienie', speech:sp(()=>CFG.closing.z5),
       choices:[
         {label:'Klient robi sam', sub:'wysyłamy listę dokumentów', to:'z6', set:s=>s.dokPoprzednie='klient sam (wysłać listę dokumentów)'},
@@ -1190,19 +1176,15 @@ const TREE = [
   {phase:5, id:'close', label:'Pytanie zamykające', needsPath:true},
   {phase:5, id:'zNo', label:'Obiekcje', needsPath:true, group:'objections'},
   {phase:5, id:'zYes', label:'Gratulacje', needsPath:true, patch:s=>s.wynik='TAK'},
-  {phase:5, id:'sms', label:'Wysłanie linku', needsPath:true},
-  {phase:5, id:'smsFix', label:'SMS nie dotarł', needsPath:true},
-  {phase:5, id:'form', label:'Prowadzenie przez formularz', needsPath:true},
+  {phase:5, id:'dane', label:'Dane do umowy (NIP, e-mail)', needsPath:true},
   {phase:5, id:'z1', label:'[Z1] Umowa + opłata aktywacyjna', needsPath:true},
   {phase:5, id:'z1a', label:'[Z1a] Propozycja terminu', needsPath:true},
   {phase:5, id:'z1b', label:'[Z1a] Kolejny termin', needsPath:true},
   {phase:5, id:'z1ok', label:'[Z1a] Termin potwierdzony', needsPath:true},
   {phase:5, id:'zMies', label:'[Z1b] Pierwszy miesiąc rozliczeniowy', needsPath:true},
   {phase:5, id:'zMies6', label:'[Z1b] Uprzedzenie o 6. dniu', needsPath:true},
-  {phase:5, id:'z2', label:'[Z2] Zapowiedź onboardingu', needsPath:true},
+  {phase:5, id:'z2', label:'[Z2] Zapowiedź spotkania organizacyjnego', needsPath:true},
   {phase:5, id:'z3', label:'[Z3] Pełnomocnictwa', needsPath:true},
-  {phase:5, id:'z4', label:'[Z4] Konto w US', needsPath:true, only:['B','D']},
-  {phase:5, id:'z4n', label:'[Z4] Konto w US — brak', needsPath:true, only:['B','D']},
   {phase:5, id:'z5', label:'[Z5] Dokumenty od poprzedniego biura', needsPath:true, only:['C','D']},
   {phase:5, id:'z5z', label:'[Z5] Zleca nam pozyskanie', needsPath:true, only:['C','D']},
   {phase:5, id:'z5d', label:'[Z5] Dane poprzedniego biura', needsPath:true, only:['C','D']},
@@ -1523,7 +1505,7 @@ w4(el){
     const blocks = ids.map(id=>{
       const area = CFG.areas.find(a=>a.id===id);
       const intro = CFG.wspolne.w4intro.replace('[obszar]', area.label.toLowerCase());
-      return `<p class="speech">${fill(intro)}</p><p class="speech">${fill(area.answer)}</p>`;
+      return `<p class="speech">${fill(intro)}</p><p class="speech">${fill(answerFor(area))}</p>`;
     }).join('<hr style="border:none;border-top:1px solid var(--line);margin:18px 0">');
     el.innerHTML = `<div class="card">
       <span class="tag">[W4] Prezentacja · wszystkie ${ids.length} obszary naraz</span>
@@ -1545,7 +1527,7 @@ w4(el){
   el.innerHTML = `<div class="card">
     <span class="tag">[W4] Prezentacja · ${S.areaIdx+1} z ${ids.length} · ${esc(area.label)}</span>
     <p class="speech">${fill(intro)}</p>
-    <p class="speech">${fill(area.answer)}</p>
+    <p class="speech">${fill(answerFor(area))}</p>
     <p class="speech"><b>${fill(CFG.wspolne.closingQ)}</b></p>
     <div class="dots">${ids.map((_,i)=>`<span class="${i<=S.areaIdx?'on':''}"></span>`).join('')}</div>
     <div class="navrow">
@@ -1643,8 +1625,8 @@ z1ok(el){
   const raw = S.answers.terminProp || '';
   el.innerHTML = `<div class="card">
     <span class="tag">[Z1a] Termin potwierdzony</span>
-    <h2 class="step-title">Termin onboardingu umówiony</h2>
-    <div class="fields"><div class="field"><label>Umówiony termin onboardingu (z kalendarza)</label>
+    <h2 class="step-title">Termin spotkania organizacyjnego umówiony</h2>
+    <div class="fields"><div class="field"><label>Umówiony termin spotkania organizacyjnego (z kalendarza)</label>
       <input type="datetime-local" id="tf" value="${esc(raw)}">
       <div class="dt-preview" id="tfPrev">${esc(S.termin || fmtTermin(raw))}</div></div></div>
     <div class="navrow">
@@ -1693,7 +1675,7 @@ zNoA(el){
   if(!o){ goReplace('zNo'); return; }
   el.innerHTML = `<div class="card">
     <span class="tag">Obiekcja · ${esc(o.label)}</span>
-    <p class="speech">${fill(o.answer)}</p>
+    <p class="speech">${fill(answerFor(o))}</p>
     <div class="choices">
       <button class="choice" type="button" id="objWin"><span>Klient przekonany — wracam do zamknięcia 🎉</span><span class="arr">›</span></button>
       <button class="choice" type="button" id="objMore"><span>Ma kolejną obiekcję</span><span class="arr">›</span></button>
@@ -1832,19 +1814,15 @@ settings(el){
     <div class="sect-body">
       ${setRow('closing.close','Pytanie zamykające „działamy?"')}
       ${setRow('closing.gratulacje','Po TAK — gratulacje')}
-      ${setRow('closing.sms','Wysłanie linku SMS')}
-      ${setRow('closing.smsFixHint','Podpowiedź, gdy SMS nie dotarł')}
-      ${setRow('closing.form','Prowadzenie przez formularz')}
+      ${setRow('closing.dane','Zapowiedź umowy + prośba o NIP i e-mail')}
       ${setRow('closing.z1','[Z1] Umowa + opłata aktywacyjna')}
       ${setRow('closing.z1a','[Z1a] Propozycja terminu')}
       ${setRow('closing.z1b','[Z1a] Kolejny termin')}
       ${setRow('closing.z1bHint','[Z1a] Podpowiedź dla handlowca')}
       ${setRow('closing.miesiacQ','[Z1b] Pytanie o pierwszy miesiąc rozliczeniowy')}
       ${setRow('closing.szostyDzien','[Z1b] Uprzedzenie o terminie 6. dnia (start po 6.)')}
-      ${setRow('closing.z2','[Z2] Zapowiedź onboardingu')}
+      ${setRow('closing.z2','[Z2] Zapowiedź spotkania organizacyjnego')}
       ${setRow('closing.z3','[Z3] Pełnomocnictwa')}
-      ${setRow('closing.z4','[Z4] Konto organizacji w US (spółki)')}
-      ${setRow('closing.z4n','[Z4] Gdy nie ma konta')}
       ${setRow('closing.z5','[Z5] Dokumenty od poprzedniego biura (przeniesienia)')}
       ${setRow('closing.z5z','[Z5] Gdy zleca nam')}
       ${setRow('closing.z5u','[Z5] Gdy prześle dane później')}
@@ -1856,10 +1834,8 @@ settings(el){
 
   <details class="sect"><summary>SMS podsumowujący <small>· wysyłany klientowi po rozmowie</small><span class="chev">›</span></summary>
     <div class="sect-body">
-      <div class="srow"><label>Znaczniki: {K} = imię klienta (odmienia się samo), [termin] = termin onboardingu, [miesiąc] = pierwszy miesiąc księgowania, [imię] = wpisuje handlowiec po wklejeniu. Linie warunkowe wchodzą do SMS-a tylko, gdy dotyczą klienta.</label></div>
+      <div class="srow"><label>Znaczniki: {K} = imię klienta (odmienia się samo), [termin] = termin spotkania organizacyjnego, [miesiąc] = pierwszy miesiąc księgowania, [imię] = wpisuje handlowiec po wklejeniu. Linia o miesiącu wchodzi do SMS-a tylko, gdy handlowiec ustalił miesiąc.</label></div>
       ${setRow('sms.main','Część główna (termin, komputer, ok. 1 h, opłata aktywacyjna)')}
-      ${setRow('sms.pelnomocnictwa','Linia warunkowa: pełnomocnictwa (gdy klient składa sam)')}
-      ${setRow('sms.kontoUS','Linia warunkowa: konto organizacji w US (gdy spółka go nie ma)')}
       ${setRow('sms.miesiac','Linia: pierwszy miesiąc księgowania')}
       ${setRow('sms.koniec','Zakończenie i podpis')}
     </div>
@@ -2088,6 +2064,8 @@ function objItemHTML(o,i){
       <input type="text" data-ofield="${i}|label" value="${esc(o.label)}"></div>
     <div class="srow"><label>Odpowiedź zbijająca (mówiona przez handlowca)</label>
       <textarea data-ofield="${i}|answer" style="min-height:110px">${esc(o.answer)}</textarea></div>
+    <div class="srow"><label>Wersja dla spółek (ścieżki B i D) — zostaw puste, żeby użyć odpowiedzi wyżej</label>
+      <textarea data-ofield="${i}|answerSpolka" style="min-height:90px" placeholder="puste = ta sama treść co wyżej">${esc(o.answerSpolka||'')}</textarea></div>
   </div>`;
 }
 function areaItemHTML(a,i){
@@ -2103,6 +2081,8 @@ function areaItemHTML(a,i){
       <input type="text" data-afield="${i}|label" value="${esc(a.label)}"></div>
     <div class="srow"><label>Odpowiedź handlowca (prezentacja)</label>
       <textarea data-afield="${i}|answer" style="min-height:110px">${esc(a.answer)}</textarea></div>
+    <div class="srow"><label>Wersja dla spółek (ścieżki B i D) — zostaw puste, żeby użyć odpowiedzi wyżej</label>
+      <textarea data-afield="${i}|answerSpolka" style="min-height:90px" placeholder="puste = ta sama treść co wyżej">${esc(a.answerSpolka||'')}</textarea></div>
   </div>`;
 }
 
@@ -2221,10 +2201,10 @@ function buildNote(){
     if(S.wynik) L.push('Wynik: ' + (S.wynik==='TAK' ? 'TAK — działamy ✅' : 'NIE / obiekcje ❌'));
     if(A.closeTxt) L.push('Odpowiedź klienta: ' + A.closeTxt);
     if(A.obiekcja) L.push('Obiekcja (własna notatka): ' + A.obiekcja);
-    if(S.termin) L.push('Termin onboardingu: ' + S.termin);
+    if(S.termin) L.push('Termin spotkania organizacyjnego: ' + S.termin);
+    if(S.nip) L.push('NIP firmy: ' + S.nip);
+    if(S.mail) L.push('E-mail klienta (umowa): ' + S.mail);
     if(A.pierwszyMiesiac) L.push('Pierwszy miesiąc księgowania: ' + A.pierwszyMiesiac + (S.info6 ? ' (start po 6. dniu — poinformowano, że księgowanie nie będzie terminowe)' : ''));
-    if(S.pelnomocnictwa) L.push('Pełnomocnictwa: ' + S.pelnomocnictwa);
-    if(S.kontoUS) L.push('Konto organizacji w US: ' + S.kontoUS);
     if(S.dokPoprzednie) L.push('Dokumenty od poprzedniego biura: ' + S.dokPoprzednie);
     if(S.popTel) L.push('Tel. poprzedniego biura: ' + S.popTel);
     if(S.popMail) L.push('Mail poprzedniego biura: ' + S.popMail);
@@ -2237,8 +2217,8 @@ function buildNote(){
   if((cityQ && A[cityQ.id]) || A.wojewodztwo){
     todo.push('sprawdzić aktualne nabory dotacji' + (A.wojewodztwo ? ' — woj. ' + A.wojewodztwo : ' dla regionu klienta') + ' i przekazać partnerowi');
   }
-  if(S.pelnomocnictwa.startsWith('sam')) todo.push('wysłać instrukcję pełnomocnictw');
-  if(S.kontoUS.startsWith('brak')) todo.push('wysłać instrukcję założenia konta organizacji w US');
+  if(S.wynik==='TAK') todo.push('wysłać umowę mailem' + (S.mail ? ' na adres: ' + S.mail : ' — uzupełnić adres klienta'));
+  if(S.wynik==='TAK') todo.push('wysłać pełnomocnictwa w PDF — klient odsyła podpisane papierowo do biura');
   if(S.dokPoprzednie.startsWith('klient')) todo.push('wysłać listę dokumentów do pozyskania');
   if(S.dokPoprzednie.startsWith('zleca') && S.popTermin) todo.push('wysłać SMS z adresem mailowym do przesłania danych biura');
   if(S.path && todo.length && S.wynik==='TAK'){
@@ -2253,7 +2233,7 @@ function renderNote(){
   $('#noteText').textContent = t;
   $('#noteText2').textContent = t;
   /* SMS pokazujemy dopiero po zakończeniu całej rozmowy z wynikiem TAK —
-     wtedy wszystkie dane (termin, pełnomocnictwa, konto US, pierwszy miesiąc) są zebrane */
+     wtedy wszystkie dane (termin, pierwszy miesiąc) są zebrane */
   const smsReady = S.step==='end' && S.wynik==='TAK';
   $('#smsPanel').style.display = smsReady ? '' : 'none';
   $('#smsMWrap').style.display = smsReady ? '' : 'none';
