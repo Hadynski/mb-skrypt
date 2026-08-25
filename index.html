@@ -212,6 +212,12 @@ details.crbr .body{padding:14px 16px;font-size:15px;line-height:1.6;color:var(--
 .notes-sms .notes-body{max-height:20vh}
 .notes-body-sms{max-height:30vh}
 .notes-obj{flex:none}
+.notes-own{flex:none}
+.notes-own .notes-body{padding:12px 14px}
+.notes-own textarea{
+  min-height:96px;font-size:14px;line-height:1.55;background:var(--card2);
+}
+.notes-own .own-hint{font-size:12px;color:var(--text3);margin-top:7px}
 .obj-chips{display:flex;flex-wrap:wrap;gap:7px;padding:12px 16px}
 .obj-chip{
   font:inherit;font-size:12.5px;font-weight:600;color:var(--accent);
@@ -428,13 +434,20 @@ details.sect > summary small{font-weight:500;font-size:13px;color:var(--text2)}
         </div>
         <div class="notes-body"><pre id="smsText"></pre></div>
       </div>
+      <div class="notes notes-own">
+        <div class="notes-head"><h3>Własne notatki</h3></div>
+        <div class="notes-body">
+          <textarea id="ownNotes" placeholder="Zapisz cokolwiek — wpadnie do notatki do CRM…"></textarea>
+          <div class="own-hint">Dopisuje się do notatki z rozmowy.</div>
+        </div>
+      </div>
       <div class="notes notes-obj">
         <div class="notes-head"><h3>Obiekcje — szybka odpowiedź</h3></div>
         <div class="obj-chips" id="objChips"></div>
       </div>
     </aside>
   </main>
-  <p class="footer-note">Skrypt wewnętrzny M&amp;B · treści edytowalne w Ustawieniach · wersja 24 (24.08.2026)</p>
+  <p class="footer-note">Skrypt wewnętrzny M&amp;B · treści edytowalne w Ustawieniach · wersja 25 (24.08.2026)</p>
 </div>
 
 <div class="fabs" id="fabs">
@@ -486,6 +499,11 @@ details.sect > summary small{font-weight:500;font-size:13px;color:var(--text2)}
       <button class="copy-btn" id="copyBtn2" type="button">Kopiuj</button>
     </div>
     <div class="notes-body"><pre id="noteText2"></pre></div>
+    <div class="notes-head" style="border-top:1px solid var(--line2)"><h3>Własne notatki</h3></div>
+    <div class="notes-body notes-own">
+      <textarea id="ownNotes2" placeholder="Zapisz cokolwiek — wpadnie do notatki do CRM…"></textarea>
+      <div class="own-hint">Dopisuje się do notatki z rozmowy.</div>
+    </div>
     <div id="smsMWrap" style="display:none">
       <div class="notes-head" style="border-top:1px solid var(--line2)">
         <h3>SMS do klienta</h3>
@@ -761,7 +779,7 @@ function freshState(){
     wbiuroZnaUsluge:null, wbiuroChce:null,
     objectionsRaised:[], currentObjection:null, info6:false,
     wynik:null, termin:'', nip:'', mail:'',
-    dokPoprzednie:'', popTel:'', popMail:'', popTermin:'', z6:'',
+    dokPoprzednie:'', popTel:'', popMail:'', popTermin:'', z6:'', wlasneNotatki:'',
     step:'setup', history:[], settingsReturn:null,
   };
 }
@@ -2211,6 +2229,10 @@ function buildNote(){
     if(S.popTermin) L.push('Klient prześle dane biura: ' + S.popTermin);
     if(S.z6) L.push('Uwagi końcowe: ' + S.z6);
   }
+  if(S.wlasneNotatki && S.wlasneNotatki.trim()){
+    L.push(''); L.push('— WŁASNE NOTATKI —');
+    L.push(S.wlasneNotatki.trim());
+  }
   const todo = [];
   if(S.path && CFG.paths[S.path].optyTodo) todo.push('przekazać dane do działu optymalizacji');
   const cityQ = S.path ? CFG.paths[S.path].questions.find(q=>q.type==='city') : null;
@@ -2232,6 +2254,11 @@ function renderNote(){
   const t = buildNote();
   $('#noteText').textContent = t;
   $('#noteText2').textContent = t;
+  /* własne notatki: dwa pola (desktop + arkusz mobilny) trzymamy zsynchronizowane,
+     ale nigdy nie nadpisujemy tego, w którym handlowiec właśnie pisze */
+  [$('#ownNotes'), $('#ownNotes2')].forEach(el=>{
+    if(el && el !== document.activeElement && el.value !== S.wlasneNotatki) el.value = S.wlasneNotatki;
+  });
   /* SMS pokazujemy dopiero po zakończeniu całej rozmowy z wynikiem TAK —
      wtedy wszystkie dane (termin, pierwszy miesiąc) są zebrane */
   const smsReady = S.step==='end' && S.wynik==='TAK';
@@ -2373,6 +2400,14 @@ $('#copyHeadBtn').onclick = e=> copyNote(e.target);
 $('#mCopy').onclick = e=> copyNote(e.target);
 $('#smsBtn').onclick = e=> copySms(e.target);
 $('#smsBtn2').onclick = e=> copySms(e.target);
+[['#ownNotes','#ownNotes2'], ['#ownNotes2','#ownNotes']].forEach(([src,dst])=>{
+  const el = $(src); if(!el) return;
+  el.addEventListener('input', ()=>{
+    S.wlasneNotatki = el.value;
+    const other = $(dst); if(other) other.value = el.value;
+    save(); renderNote();
+  });
+});
 $('#mFab').onclick = ()=> $('#sheet').classList.add('open');
 $('#scrim').onclick = ()=> $('#sheet').classList.remove('open');
 $('#mObj').onclick = ()=>{ objCurrent=null; renderObjBody(); renderObjChips(); $('#objSheet').classList.add('open'); };
