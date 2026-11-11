@@ -447,7 +447,7 @@ details.sect > summary small{font-weight:500;font-size:13px;color:var(--text2)}
       </div>
     </aside>
   </main>
-  <p class="footer-note">Skrypt wewnętrzny M&amp;B · treści edytowalne w Ustawieniach · wersja 25 (24.08.2026)</p>
+  <p class="footer-note">Skrypt wewnętrzny M&amp;B · treści edytowalne w Ustawieniach · wersja 26 (11.11.2026)</p>
 </div>
 
 <div class="fabs" id="fabs">
@@ -528,7 +528,7 @@ const MIEJSCOWOSC_Q = {
 const WOJEWODZTWA = ['dolnośląskie','kujawsko-pomorskie','lubelskie','lubuskie','łódzkie','małopolskie','mazowieckie','opolskie','podkarpackie','podlaskie','pomorskie','śląskie','świętokrzyskie','warmińsko-mazurskie','wielkopolskie','zachodniopomorskie'];
 
 const DEFAULT_CONFIG = {
-  version: 7,
+  version: 8,
   intro: {
     k0: `Dzień dobry, z tej strony {H}, M&B Biuro Rachunkowe. Zostawiono u nas prośbę o kontakt — czy to się zgadza?`,
     k1a: `W zgłoszeniu mam podane, że mam przyjemność z Panem {K} — czy to się zgadza?`,
@@ -624,6 +624,7 @@ const DEFAULT_CONFIG = {
     },
   },
   wspolne: {
+    emeryturaQ: `I ostatnia rzecz — czy pobiera Pan emeryturę albo rentę? Pytam, bo to potrafi zmienić składki i roczne rozliczenie, więc lepiej, żebyśmy wiedzieli o tym od razu.`,
     w1: `Panie {K}, już wiem zdecydowanie więcej. Teraz ważne pytanie — na czym Panu najbardziej zależy we współpracy z biurem rachunkowym?`,
     w2: `Panie {K}, a gdyby ta współpraca miała być jeszcze lepsza, to co mógłby Pan jeszcze wymienić?`,
     w3: `Czyli rozumiem, że najbardziej zależy Panu na: [obszary] — czy to się zgadza?`,
@@ -774,7 +775,7 @@ function freshState(){
     handlowiec:'', hasName:null, clientName:'', gender:'m', genderManual:false,
     path:null, answers:{}, qIdx:0, pqFollow:null,
     priorities:[], areaIdx:0,
-    emp:null, empCount:'',
+    emp:null, empCount:'', emerytura:null,
     reakcja:'', priceOverride:null,
     wbiuroZnaUsluge:null, wbiuroChce:null,
     objectionsRaised:[], currentObjection:null, info6:false,
@@ -1052,6 +1053,13 @@ const STEPS = {
   pq:{phase:1, custom:'pq'},
   pqf:{phase:1, custom:'pqf'},
   pEmp:{phase:1, custom:'emp'},
+  /* obowiązkowe TAK/NIE — brak przycisku „Dalej", więc nie da się przejść bez odpowiedzi */
+  pEmer:{phase:1, dynTag:()=>`[${S.path}·emerytura] Emerytura lub renta`,
+      speech:sp(()=>CFG.wspolne.emeryturaQ),
+      choices:[
+        {label:'TAK — pobiera', to:'w1', set:s=>s.emerytura=true},
+        {label:'NIE — nie pobiera', to:'w1', set:s=>s.emerytura=false},
+      ]},
 
   w1:{phase:2, tag:'[W1] Na czym mu zależy', custom:'w1'},
   w2:{phase:2, tag:'[W2] Na czym jeszcze mu zależy', custom:'w2'},
@@ -1180,6 +1188,7 @@ const TREE = [
   {phase:1, id:'p1', label:'Zgoda na pytania', needsPath:true},
   {phase:1, id:'pq', label:'Pytania wywiadu', needsPath:true, group:'questions'},
   {phase:1, id:'pEmp', label:'Pracownicy', needsPath:true},
+  {phase:1, id:'pEmer', label:'Emerytura lub renta', needsPath:true},
   {phase:2, id:'w1', label:'[W1] Na czym mu zależy', needsPath:true},
   {phase:2, id:'w2', label:'[W2] Na czym jeszcze mu zależy', needsPath:true},
   {phase:2, id:'w3', label:'[W3] Podsumowanie', needsPath:true},
@@ -1484,7 +1493,7 @@ emp(el){
     </div>
     <div class="navrow">
       <button class="btn btn-ghost" id="backBtn" type="button">‹ Wstecz</button>
-      <button class="btn btn-primary" id="nextBtn" type="button">Dalej — priorytety klienta</button>
+      <button class="btn btn-primary" id="nextBtn" type="button">Dalej — ostatnie pytanie</button>
     </div></div>`;
   $('#empY').onclick = ()=>{ S.emp = true; save(); render(); };
   $('#empN').onclick = ()=>{ S.emp = false; S.empCount=''; save(); render(); };
@@ -1493,7 +1502,7 @@ emp(el){
     const qs = CFG.paths[S.path].questions;
     if(qs.length){ S.qIdx = qs.length-1; S.step='pq'; save(); render(); } else back();
   };
-  el.querySelector('#nextBtn').onclick = ()=> go('w1');
+  el.querySelector('#nextBtn').onclick = ()=> go('pEmer');
 },
 
 w1(el){ renderAreasPick(el, 'w1'); },
@@ -1762,11 +1771,18 @@ settings(el){
         <div id="qlist${p}">${CFG.paths[p].questions.map((q,i)=>qItemHTML(p,q,i)).join('')}</div>
         <button class="addbtn" type="button" data-addq="${p}">＋ Dodaj pytanie</button>
       </div>
-      ${setRow(`paths.${p}.emp.speech`,'Pytanie o pracowników (decyduje o bloku cenowym — zawsze ostatnie)')}
+      ${setRow(`paths.${p}.emp.speech`,'Pytanie o pracowników (decyduje o bloku cenowym — przedostatnie w wywiadzie)')}
       <div class="srow"><label><input type="checkbox" data-cfgchk="paths.${p}.optyTodo" ${CFG.paths[p].optyTodo?'checked':''}>
         Po rozmowie przypominaj: „przekaż dane do działu optymalizacji"</label></div>
     </div>
   </details>`).join('')}
+
+  <details class="sect"><summary>Wywiad — pytanie wspólne <small>· zadawane na wszystkich ścieżkach</small><span class="chev">›</span></summary>
+    <div class="sect-body">
+      <div class="srow"><label>Ostatnie pytanie wywiadu, wspólne dla ścieżek A–D. Handlowiec musi kliknąć TAK albo NIE — bez tego nie przejdzie dalej.</label></div>
+      ${setRow('wspolne.emeryturaQ','Emerytura lub renta')}
+    </div>
+  </details>
 
   <details class="sect"><summary>Priorytety i prezentacja <small>· W1–W6 + obszary (mapa obiekcji)</small><span class="chev">›</span></summary>
     <div class="sect-body">
@@ -2185,6 +2201,7 @@ function buildNote(){
     });
   }
   if(S.emp!==null) wywiad.push('Pracownicy: ' + (S.emp ? ('TAK' + (S.empCount?` (${S.empCount})`:'')) : 'NIE'));
+  if(S.emerytura!==null) wywiad.push('Emerytura lub renta: ' + (S.emerytura ? 'TAK' : 'NIE'));
   if(wywiad.length){ L.push(''); L.push('— WYWIAD —'); L.push(...wywiad); }
   const prio = S.priorities.map(id=>CFG.areas.find(a=>a.id===id)).filter(Boolean);
   if(prio.length){
